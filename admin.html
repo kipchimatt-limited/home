@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kipchimatt Recruitment Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        kipchi: {
+                            red: '#dc2626',
+                            darkRed: '#991b1b',
+                            black: '#0f172a',
+                            light: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-size: 13px; background-color: #f1f5f9; color: #334155; margin: 0; }
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .form-input {
+            width: 100%; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.35rem 0.5rem;
+            font-size: 0.75rem; outline: none; transition: all 0.2s; height: 32px; background: white;
+        }
+        .form-input:focus { border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1); }
+        .form-label { display: block; font-size: 0.65rem; font-weight: 700; color: #475569; margin-bottom: 0.15rem; text-transform: uppercase; letter-spacing: 0.025em; }
+        
+        .btn { padding: 0.4rem 0.75rem; border-radius: 0.25rem; font-weight: 600; text-align: center; transition: all 0.2s; cursor: pointer; font-size: 0.75rem; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary { background-color: #dc2626; color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: #991b1b; }
+        .btn-dark { background-color: #0f172a; color: white; }
+        .btn-dark:hover:not(:disabled) { background-color: #1e293b; }
+        .btn-outline { border: 1px solid #cbd5e1; color: #475569; background: transparent; }
+        .btn-outline:hover:not(:disabled) { background-color: #f8fafc; border-color: #94a3b8; }
+        .btn-danger { background-color: #ef4444; color: white; }
+        .btn-danger:hover:not(:disabled) { background-color: #b91c1c; }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+        .toast { padding: 0.5rem 0.75rem; border-radius: 0.25rem; color: white; font-weight: 500; font-size: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out forwards; min-width: 250px; display: flex; justify-between: space-between; align-items: center; }
+        .toast.success { background-color: #10b981; }
+        .toast.error { background-color: #ef4444; }
+        .toast.info { background-color: #3b82f6; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(2px); z-index: 50; display: none; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-out; }
+        .modal-content { background: white; border-radius: 0.5rem; width: 100%; max-width: 850px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        
+        .badge { padding: 0.15rem 0.45rem; border-radius: 9999px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+        .bg-status-pending { background: #fef9c3; color: #854d0e; }
+        .bg-status-review { background: #dbeafe; color: #1e40af; }
+        .bg-status-interview { background: #f3e8ff; color: #6b21a8; }
+        .bg-status-hired { background: #dcfce3; color: #166534; }
+        .bg-status-rejected { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <div id="toast-container"></div>
+
+    <!-- LOGIN SCREEN GATE -->
+    <div id="login-screen" class="fixed inset-0 bg-kipchi-black z-[100] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-sm text-center border-t-4 border-kipchi-red">
+            <div class="w-12 h-12 bg-kipchi-red rounded mx-auto flex items-center justify-center text-white font-black text-2xl leading-none mb-3 shadow">K</div>
+            <h2 class="text-xl font-extrabold text-kipchi-black">Kipchimatt Admin</h2>
+            <p class="text-xs text-slate-500 mb-6">Recruitment & Portal Management</p>
+            
+            <form onsubmit="event.preventDefault(); adminApp.login();">
+                <div class="mb-4">
+                    <label class="form-label text-left">Enter Master Admin PIN</label>
+                    <input type="password" id="login-pin" class="form-input text-center text-xl tracking-widest h-12 font-mono" placeholder="••••••" maxlength="10" autofocus>
+                </div>
+                <button type="submit" class="btn btn-primary w-full h-10 text-sm font-bold">Verify & Log In</button>
+            </form>
+            <p id="login-error" class="text-xs text-red-600 font-bold mt-3 hidden">Invalid Admin PIN. Try again.</p>
+        </div>
+    </div>
+
+    <!-- SIDEBAR NAV -->
+    <aside class="w-64 bg-kipchi-black text-slate-300 flex flex-col hidden md:flex flex-shrink-0 transition-all duration-300" id="sidebar">
+        <div class="h-16 flex items-center px-4 border-b border-slate-800 bg-slate-950">
+            <div class="w-8 h-8 bg-kipchi-red rounded flex items-center justify-center text-white font-black text-lg leading-none mr-3 shadow">K</div>
+            <div class="flex flex-col leading-none">
+                <span class="font-extrabold text-white text-sm tracking-tight">KIPCHIMATT</span>
+                <span class="text-[9px] text-kipchi-red uppercase font-bold tracking-widest">Admin Control</span>
+            </div>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li>
+                    <a href="#" onclick="adminApp.navigate('dashboard')" id="nav-dashboard" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                        <span class="mr-3 text-lg">📊</span> Dashboard Stats
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="adminApp.navigate('applications')" id="nav-applications" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                        <span class="mr-3 text-lg">👥</span> Applicant Records
+                        <span id="nav-pending-count" class="ml-auto bg-kipchi-red text-white text-[9px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="adminApp.navigate('settings')" id="nav-settings" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                        <span class="mr-3 text-lg">⚙️</span> Fee & Gateway Config
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="adminApp.navigate('security')" id="nav-security" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                        <span class="mr-3 text-lg">🔒</span> Security & PIN
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="adminApp.navigate('reports')" id="nav-reports" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                        <span class="mr-3 text-lg">📑</span> Export CSV Reports
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-800 text-xs flex justify-between items-center bg-slate-950">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]"></div>
+                <span class="text-slate-400">Cloud Live</span>
+            </div>
+            <button onclick="location.reload()" class="text-slate-400 hover:text-red-400 font-bold">Lock System</button>
+        </div>
+    </aside>
+
+    <!-- MAIN BODY -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-100 relative">
+        
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 shadow-sm z-10">
+            <div class="flex items-center">
+                <button class="md:hidden text-slate-700 mr-3 text-xl" onclick="document.getElementById('sidebar').classList.toggle('hidden')">☰</button>
+                <h1 id="page-title" class="font-extrabold text-lg text-slate-800">Dashboard Overview</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <div class="text-xs font-bold text-slate-800">Kipchimatt HR Desk</div>
+                    <div class="text-[10px] text-slate-500">Root Admin Access</div>
+                </div>
+                <div class="w-8 h-8 rounded bg-kipchi-red text-white font-extrabold flex items-center justify-center text-sm shadow">
+                    K
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6" id="main-content">
+            
+            <!-- VIEW: DASHBOARD STATS -->
+            <div id="view-dashboard" class="view-section active space-y-6">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center">
+                        <div class="w-10 h-10 rounded bg-blue-50 text-blue-600 flex items-center justify-center text-xl mr-3">📥</div>
+                        <div><p class="text-[10px] text-slate-500 font-bold uppercase">Total Applicants</p><h3 class="text-2xl font-extrabold text-slate-800" id="stat-total">0</h3></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center">
+                        <div class="w-10 h-10 rounded bg-amber-50 text-amber-600 flex items-center justify-center text-xl mr-3">⏳</div>
+                        <div><p class="text-[10px] text-slate-500 font-bold uppercase">Pending Review</p><h3 class="text-2xl font-extrabold text-slate-800" id="stat-pending">0</h3></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center">
+                        <div class="w-10 h-10 rounded bg-red-50 text-kipchi-red flex items-center justify-center text-xl mr-3">🛒</div>
+                        <div><p class="text-[10px] text-slate-500 font-bold uppercase">Supermarket Division</p><h3 class="text-2xl font-extrabold text-slate-800" id="stat-supermarket">0</h3></div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex items-center">
+                        <div class="w-10 h-10 rounded bg-slate-100 text-slate-800 flex items-center justify-center text-xl mr-3">🏬</div>
+                        <div><p class="text-[10px] text-slate-500 font-bold uppercase">Wholesale Division</p><h3 class="text-2xl font-extrabold text-slate-800" id="stat-wholesale">0</h3></div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col">
+                        <div class="p-4 border-b border-slate-100 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800">Recent Applications Stream</h3>
+                            <button class="text-xs text-kipchi-red font-bold hover:underline" onclick="adminApp.navigate('applications')">View All Records →</button>
+                        </div>
+                        <div class="p-0 overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-500 uppercase tracking-wider">
+                                        <th class="p-3 font-semibold border-b border-slate-200">Applicant</th>
+                                        <th class="p-3 font-semibold border-b border-slate-200">Division & Role</th>
+                                        <th class="p-3 font-semibold border-b border-slate-200">Status</th>
+                                        <th class="p-3 font-semibold border-b border-slate-200">Applied Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-recent-tbody" class="divide-y divide-slate-100">
+                                    <tr><td colspan="4" class="p-4 text-center text-slate-500">Connecting to cloud database...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col">
+                        <div class="p-4 border-b border-slate-100">
+                            <h3 class="font-bold text-slate-800">Applications by Station</h3>
+                        </div>
+                        <div class="p-4 flex-1 overflow-y-auto max-h-[300px]" id="dashboard-branch-dist">
+                            <p class="text-center text-slate-400 text-xs mt-4">Loading stats...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: APPLICANT RECORDS (FULL CRUD) -->
+            <div id="view-applications" class="view-section h-full flex flex-col">
+                <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm mb-4 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                    <div class="flex-1 w-full relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                        <input type="text" id="search-input" placeholder="Search by name, ID number, role, or M-PESA code..." class="form-input pl-8 w-full max-w-md" onkeyup="adminApp.filterTable()">
+                    </div>
+                    <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                        <select id="filter-division" class="form-input w-28 sm:w-32 bg-white cursor-pointer" onchange="adminApp.filterTable()">
+                            <option value="All">All Divisions</option>
+                            <option value="Supermarket">Supermarket</option>
+                            <option value="Wholesale">Wholesale</option>
+                        </select>
+                        <select id="filter-status" class="form-input w-28 sm:w-32 bg-white cursor-pointer" onchange="adminApp.filterTable()">
+                            <option value="All">All Statuses</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Interviewing">Interviewing</option>
+                            <option value="Hired">Hired</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="adminApp.fetchData()">🔄 Sync</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg border border-slate-200 shadow-sm flex-1 overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left border-collapse text-xs whitespace-nowrap">
+                            <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                                <tr class="text-slate-500 uppercase tracking-wider">
+                                    <th class="p-3 font-semibold border-b border-slate-200">ID / Trans Code</th>
+                                    <th class="p-3 font-semibold border-b border-slate-200">Applicant Name</th>
+                                    <th class="p-3 font-semibold border-b border-slate-200">Division & Role</th>
+                                    <th class="p-3 font-semibold border-b border-slate-200">Station</th>
+                                    <th class="p-3 font-semibold border-b border-slate-200 text-center">Status</th>
+                                    <th class="p-3 font-semibold border-b border-slate-200 text-right">CRUD Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="apps-tbody" class="divide-y divide-slate-100">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 border-t border-slate-200 bg-slate-50 text-[10px] text-slate-500 flex justify-between items-center">
+                        <span id="table-count-info">Showing 0 records</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: DYNAMIC FEE & GATEWAY CONFIG -->
+            <div id="view-settings" class="view-section">
+                <div class="max-w-3xl">
+                    <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mb-6">
+                        <div class="p-4 border-b border-slate-100 bg-slate-900 text-white flex justify-between items-center">
+                            <div>
+                                <h3 class="font-bold flex items-center gap-2"><span>💳</span> Dynamic Payment & Fee Settings</h3>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Controls the live fee amounts charged on the Kipchimatt portal for both Supermarket & Wholesale slots.</p>
+                            </div>
+                            <span class="bg-kipchi-red px-2 py-0.5 rounded text-[9px] font-bold uppercase">Live Cloud Sync</span>
+                        </div>
+                        <div class="p-6">
+                            <form id="config-form" onsubmit="event.preventDefault(); adminApp.saveConfig();" class="space-y-5">
+                                <div class="grid sm:grid-cols-2 gap-4">
+                                    <div class="bg-red-50/50 p-3 rounded border border-red-100">
+                                        <label class="form-label text-kipchi-red">Supermarket Application Fee (Ksh) *</label>
+                                        <input type="number" id="cfg_sup_fee" class="form-input font-mono font-bold text-slate-800" required min="0">
+                                        <span class="text-[9px] text-slate-500 mt-1 block">Charged for cashier, cleaner, deli, etc.</span>
+                                    </div>
+                                    <div class="bg-slate-100 p-3 rounded border border-slate-200">
+                                        <label class="form-label text-slate-800">Wholesale Application Fee (Ksh) *</label>
+                                        <input type="number" id="cfg_who_fee" class="form-input font-mono font-bold text-slate-800" required min="0">
+                                        <span class="text-[9px] text-slate-500 mt-1 block">Charged for loaders, forklift drivers, heavy fleet, etc.</span>
+                                    </div>
+                                </div>
+
+                                <div class="grid sm:grid-cols-2 gap-4 pt-2">
+                                    <div>
+                                        <label class="form-label">Payment Method Label *</label>
+                                        <select id="cfg_method" class="form-input bg-white" required>
+                                            <option value="Till Number">Till Number (Buy Goods)</option>
+                                            <option value="Paybill">Paybill</option>
+                                            <option value="Send Money">Send Money</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Destination Number (Till / Paybill No) *</label>
+                                        <input type="text" id="cfg_number" class="form-input font-mono tracking-widest text-kipchi-red font-bold" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-[10px] text-slate-400">Updates sync dynamically with applicant portals instantly</span>
+                                    <button type="submit" class="btn btn-primary px-6" id="btn-save-cfg">
+                                        Update Cloud Configuration
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SECURITY & PIN CHANGE -->
+            <div id="view-security" class="view-section">
+                <div class="max-w-md">
+                    <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 bg-slate-50">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2"><span>🔒</span> Admin Portal PIN Security</h3>
+                            <p class="text-[10px] text-slate-500 mt-1">Change the master PIN required to unlock this portal.</p>
+                        </div>
+                        <div class="p-6">
+                            <form onsubmit="event.preventDefault(); adminApp.changePin();" class="space-y-4">
+                                <div>
+                                    <label class="form-label">Current PIN *</label>
+                                    <input type="password" id="pin-current" class="form-input font-mono text-center tracking-widest text-sm" required placeholder="••••••">
+                                </div>
+                                <div>
+                                    <label class="form-label">New Admin PIN *</label>
+                                    <input type="password" id="pin-new" class="form-input font-mono text-center tracking-widest text-sm" required minlength="4" placeholder="••••••">
+                                </div>
+                                <div>
+                                    <label class="form-label">Confirm New PIN *</label>
+                                    <input type="password" id="pin-confirm" class="form-input font-mono text-center tracking-widest text-sm" required minlength="4" placeholder="••••••">
+                                </div>
+                                <button type="submit" class="btn btn-dark w-full mt-2">Update Security PIN</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: EXPORT REPORTS -->
+            <div id="view-reports" class="view-section">
+                <div class="max-w-2xl bg-white p-6 rounded-lg border border-slate-200 shadow-sm text-center">
+                    <div class="w-16 h-16 bg-red-50 text-kipchi-red rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">📑</div>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Export Candidate Database</h2>
+                    <p class="text-xs text-slate-500 mb-6 max-w-md mx-auto leading-relaxed">Download a complete CSV spreadsheet containing applicant demographics, division, station choices, contact numbers, and M-PESA audit codes for Excel evaluation.</p>
+                    
+                    <button class="btn btn-primary px-6 py-2.5 text-xs font-bold" onclick="adminApp.exportCSV()">
+                        <span class="mr-2 text-base">📥</span> Export Excel-Ready CSV Report
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL: VIEW / EDIT / UPDATE APPLICANT -->
+    <div id="modal-app-details" class="modal-overlay">
+        <div class="modal-content">
+            <div class="h-14 border-b border-slate-200 px-6 flex items-center justify-between bg-slate-900 text-white">
+                <h3 class="font-bold">Applicant Record & HR Controls</h3>
+                <button class="text-slate-400 hover:text-white text-2xl font-bold p-1" onclick="adminApp.closeModal()">×</button>
+            </div>
+            
+            <div class="modal-body bg-slate-100 flex flex-col md:flex-row gap-4 p-4">
+                
+                <div class="flex-1 space-y-4">
+                    <div class="bg-white p-4 rounded border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-start mb-3 border-b border-slate-100 pb-2">
+                            <div>
+                                <h4 class="font-bold text-lg text-slate-800 uppercase" id="mdl-name">...</h4>
+                                <span class="text-xs text-slate-500 font-mono" id="mdl-id">ID: ...</span>
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <span id="mdl-division-badge" class="bg-kipchi-red text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded">Supermarket</span>
+                                <span id="mdl-status-badge" class="badge">...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-2 text-xs">
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Role Title</span><strong id="mdl-role" class="text-kipchi-red">...</strong></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Station</span><strong id="mdl-branch">...</strong></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Phone</span><strong id="mdl-phone">...</strong></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Email</span><span id="mdl-email">...</span></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">County & Area</span><span id="mdl-address">...</span></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Education</span><span id="mdl-education">...</span></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Experience</span><span id="mdl-experience">...</span></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Relocate / Shift</span><span id="mdl-relocate">...</span></div>
+                            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Start Availability</span><span id="mdl-start">...</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded border border-slate-200 shadow-sm">
+                        <h5 class="font-bold text-xs text-slate-500 uppercase border-b border-slate-100 pb-1 mb-2">Applicant Responses</h5>
+                        <div id="mdl-answers" class="space-y-2.5 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-80 space-y-4">
+                    <div class="bg-slate-900 text-white p-4 rounded border border-slate-800 shadow-sm">
+                        <h5 class="font-bold text-xs text-red-400 uppercase border-b border-slate-700 pb-1 mb-2">Audit & Payment Code</h5>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400">M-PESA Code:</span>
+                            <strong id="mdl-mpesa" class="font-mono tracking-widest bg-slate-950 px-2 py-1 rounded text-emerald-400 border border-slate-800">...</strong>
+                        </div>
+                        <div class="flex justify-between items-center text-[10px] mt-2 text-slate-400">
+                            <span>Submitted:</span>
+                            <span id="mdl-date">...</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded border border-slate-200 shadow-sm">
+                        <h5 class="font-bold text-xs text-slate-500 uppercase border-b border-slate-100 pb-1 mb-3">Update Application Status</h5>
+                        
+                        <label class="form-label">Status</label>
+                        <select id="mdl-status-select" class="form-input bg-white mb-3 font-semibold">
+                            <option value="Under Review">Under Review</option>
+                            <option value="Interviewing">Interviewing</option>
+                            <option value="Hired">Hired</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                        
+                        <label class="form-label">Add HR Internal Note</label>
+                        <textarea id="mdl-new-note" class="form-input mb-3 text-xs" style="height: 55px; resize: none;" placeholder="Log phone calls, interview schedule, etc..."></textarea>
+                        
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary flex-1" onclick="adminApp.saveApplicationUpdates()">
+                                <span id="mdl-btn-text">Save Changes</span>
+                                <span id="mdl-spinner" class="spinner hidden"></span>
+                            </button>
+                            <button class="btn btn-danger" title="Delete Applicant Record" onclick="adminApp.deleteCurrentApplicant()">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded border border-slate-200 shadow-sm max-h-44 flex flex-col">
+                        <h5 class="font-bold text-xs text-slate-500 uppercase border-b border-slate-100 pb-1 mb-2">HR Notes History</h5>
+                        <div id="mdl-notes-history" class="overflow-y-auto space-y-2 text-[10px] flex-1 pr-1">
+                            <p class="text-slate-400 text-center italic mt-2">No notes recorded yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, updateDoc, deleteDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        window.adminApp = {
+            appId: typeof __app_id !== 'undefined' ? __app_id : 'kipchimatt-portal',
+            db: null,
+            auth: null,
+            currentUser: null,
+            applications: [],
+            currentAppId: null,
+            unsubscribeApps: [],
+            masterPin: localStorage.getItem('kipchimatt_admin_pin') || '115800',
+
+            firebaseConfig: typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+                apiKey: "AIzaSyAXOvScQp_iMQIgBeb0RgaDPq8BoF7y7OQ",
+                authDomain: "kipchi.firebaseapp.com",
+                projectId: "kipchi",
+                storageBucket: "kipchi.firebasestorage.app",
+                messagingSenderId: "140401878759",
+                appId: "1:140401878759:web:b1e8ab17a9f39d0957a442"
+            },
+
+            login: async function() {
+                const pin = document.getElementById('login-pin').value;
+                if (pin === this.masterPin) {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    this.showToast("Admin authenticated.", "success");
+                    await this.initFirebase();
+                } else {
+                    document.getElementById('login-error').classList.remove('hidden');
+                    document.getElementById('login-pin').value = '';
+                }
+            },
+
+            changePin: function() {
+                const curr = document.getElementById('pin-current').value;
+                const newP = document.getElementById('pin-new').value;
+                const confP = document.getElementById('pin-confirm').value;
+
+                if (curr !== this.masterPin) {
+                    this.showToast("Current PIN incorrect.", "error");
+                    return;
+                }
+                if (newP !== confP) {
+                    this.showToast("New PINs do not match.", "error");
+                    return;
+                }
+
+                this.masterPin = newP;
+                localStorage.setItem('kipchimatt_admin_pin', newP);
+                this.showToast("Security PIN updated successfully!", "success");
+                document.getElementById('pin-current').value = '';
+                document.getElementById('pin-new').value = '';
+                document.getElementById('pin-confirm').value = '';
+            },
+
+            initFirebase: async function() {
+                try {
+                    const fbApp = initializeApp(this.firebaseConfig);
+                    this.auth = getAuth(fbApp);
+                    this.db = getFirestore(fbApp);
+
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(this.auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(this.auth);
+                    }
+                    this.currentUser = this.auth.currentUser;
+
+                    this.fetchData();
+                    this.fetchConfig();
+                    
+                } catch (error) {
+                    console.error("Firebase error:", error);
+                    this.showToast("Connection failed. Check Firebase config.", "error");
+                }
+            },
+
+            navigate: function(viewId) {
+                document.querySelectorAll('.nav-link').forEach(el => {
+                    el.classList.remove('bg-slate-900', 'text-white', 'border-kipchi-red');
+                    el.classList.add('border-transparent');
+                });
+                const activeLink = document.getElementById(`nav-${viewId}`);
+                if(activeLink) activeLink.classList.add('bg-slate-900', 'text-white', 'border-kipchi-red');
+
+                const titles = {
+                    'dashboard': 'Dashboard Stats & Stream',
+                    'applications': 'Applicant Database (CRUD)',
+                    'settings': 'Fee & Payment Gateway Config',
+                    'security': 'Master PIN Security',
+                    'reports': 'CSV Report Generation'
+                };
+                document.getElementById('page-title').textContent = titles[viewId] || 'Portal';
+
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                const view = document.getElementById(`view-${viewId}`);
+                if(view) view.classList.add('active');
+            },
+
+            showToast: function(msg, type='info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `<span>${msg}</span> <button onclick="this.parentElement.remove()">×</button>`;
+                container.appendChild(toast);
+                setTimeout(() => { if(toast.parentElement) toast.remove(); }, 4000);
+            },
+
+            fetchData: function() {
+                if (!this.currentUser) return;
+                
+                // Clear any existing snapshot subscriptions
+                if (this.unsubscribeApps && this.unsubscribeApps.length) {
+                    this.unsubscribeApps.forEach(unsub => unsub());
+                    this.unsubscribeApps = [];
+                }
+
+                this.showToast("Syncing records across collections...", "info");
+
+                const appMap = new Map();
+
+                const handleDocs = (snapshot, sourcePath) => {
+                    snapshot.forEach((docSnap) => {
+                        appMap.set(docSnap.id, { docId: docSnap.id, sourcePath: sourcePath, ...docSnap.data() });
+                    });
+                    
+                    this.applications = Array.from(appMap.values());
+                    this.applications.sort((a, b) => {
+                        const tA = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : new Date(a.timestamp).getTime()) : 0;
+                        const tB = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : new Date(b.timestamp).getTime()) : 0;
+                        return tB - tA;
+                    });
+
+                    this.updateDashboard();
+                    this.filterTable();
+                };
+
+                // Path 1: Canvas Environment Collection
+                const path1 = collection(this.db, 'artifacts', this.appId, 'public', 'data', 'applications');
+                const unsub1 = onSnapshot(path1, (snap) => handleDocs(snap, 'artifacts'), (err) => console.log("Path 1 error", err));
+
+                // Path 2: Root Applications Collection
+                const path2 = collection(this.db, 'applications');
+                const unsub2 = onSnapshot(path2, (snap) => handleDocs(snap, 'root'), (err) => console.log("Path 2 error", err));
+
+                this.unsubscribeApps = [unsub1, unsub2];
+            },
+
+            fetchConfig: async function() {
+                if (!this.currentUser) return;
+                try {
+                    let cfgRef = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'config', 'paymentConfig');
+                    let snap = await getDoc(cfgRef);
+                    
+                    if (!snap.exists()) {
+                        cfgRef = doc(this.db, 'config', 'paymentConfig');
+                        snap = await getDoc(cfgRef);
+                    }
+
+                    if(snap.exists()) {
+                        const data = snap.data();
+                        document.getElementById('cfg_sup_fee').value = data.supermarketFee || 10;
+                        document.getElementById('cfg_who_fee').value = data.wholesaleFee || 20;
+                        document.getElementById('cfg_method').value = data.method || 'Till Number';
+                        document.getElementById('cfg_number').value = data.number || '5401672';
+                    }
+                } catch(e) {
+                    console.error("Config error", e);
+                }
+            },
+
+            saveConfig: async function() {
+                if (!this.currentUser) return;
+                const btn = document.getElementById('btn-save-cfg');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner mr-2"></span> Saving...';
+
+                try {
+                    const data = {
+                        supermarketFee: parseInt(document.getElementById('cfg_sup_fee').value),
+                        wholesaleFee: parseInt(document.getElementById('cfg_who_fee').value),
+                        method: document.getElementById('cfg_method').value,
+                        number: document.getElementById('cfg_number').value,
+                        updatedAt: serverTimestamp()
+                    };
+
+                    const cfgRef1 = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'config', 'paymentConfig');
+                    await setDoc(cfgRef1, data);
+
+                    const cfgRef2 = doc(this.db, 'config', 'paymentConfig');
+                    await setDoc(cfgRef2, data);
+
+                    this.showToast("Payment fees & details updated live!", "success");
+                } catch(e) {
+                    console.error("Config save error", e);
+                    this.showToast("Failed to update config.", "error");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Update Cloud Configuration';
+                }
+            },
+
+            updateDashboard: function() {
+                let pending = 0, supCount = 0, whoCount = 0;
+                let branchMap = {};
+
+                this.applications.forEach(app => {
+                    if (app.status === 'Under Review' || app.status === 'Pending Payment') pending++;
+                    if (app.division === 'Wholesale') whoCount++; else supCount++;
+
+                    branchMap[app.branch || 'Main'] = (branchMap[app.branch || 'Main'] || 0) + 1;
+                });
+
+                document.getElementById('stat-total').textContent = this.applications.length;
+                document.getElementById('stat-pending').textContent = pending;
+                document.getElementById('stat-supermarket').textContent = supCount;
+                document.getElementById('stat-wholesale').textContent = whoCount;
+                
+                const navBadge = document.getElementById('nav-pending-count');
+                if (pending > 0) { navBadge.textContent = pending; navBadge.classList.remove('hidden'); } 
+                else { navBadge.classList.add('hidden'); }
+
+                const tbody = document.getElementById('dashboard-recent-tbody');
+                tbody.innerHTML = '';
+                this.applications.slice(0, 5).forEach(app => {
+                    const dateStr = app.timestamp && app.timestamp.toDate ? app.timestamp.toDate().toLocaleDateString() : 'Recent';
+                    let tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="p-3 font-bold text-slate-800 uppercase">${app.firstName || ''} ${app.lastName || ''}</td>
+                        <td class="p-3"><span class="text-kipchi-red font-semibold">${app.division || 'Sup'}</span> - ${app.jobTitle || 'Role'}</td>
+                        <td class="p-3">${this.getStatusBadge(app.status || 'Under Review')}</td>
+                        <td class="p-3 text-slate-500">${dateStr}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                if(this.applications.length === 0) tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">No candidate submissions yet.</td></tr>';
+
+                const distContainer = document.getElementById('dashboard-branch-dist');
+                distContainer.innerHTML = '';
+                Object.keys(branchMap).sort((a,b) => branchMap[b] - branchMap[a]).forEach(b => {
+                    const pct = Math.round((branchMap[b] / this.applications.length) * 100);
+                    distContainer.innerHTML += `
+                        <div class="mb-3 last:mb-0">
+                            <div class="flex justify-between text-[11px] font-bold text-slate-700 mb-1">
+                                <span class="truncate pr-2">${b}</span><span>${branchMap[b]} (${pct}%)</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-1.5">
+                                <div class="bg-kipchi-red h-1.5 rounded-full" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            filterTable: function() {
+                const searchQ = document.getElementById('search-input').value.toLowerCase();
+                const statusQ = document.getElementById('filter-status').value;
+                const divQ = document.getElementById('filter-division').value;
+                const tbody = document.getElementById('apps-tbody');
+                
+                tbody.innerHTML = '';
+                let count = 0;
+
+                this.applications.forEach(app => {
+                    const name = `${app.firstName || ''} ${app.lastName || ''}`.toLowerCase();
+                    const id = (app.idNumber || '').toLowerCase();
+                    const role = (app.jobTitle || '').toLowerCase();
+                    const trans = (app.transactionCode || '').toLowerCase();
+
+                    const matchesSearch = name.includes(searchQ) || id.includes(searchQ) || role.includes(searchQ) || trans.includes(searchQ);
+                    const matchesStatus = statusQ === 'All' || app.status === statusQ;
+                    const matchesDiv = divQ === 'All' || app.division === divQ;
+
+                    if (matchesSearch && matchesStatus && matchesDiv) {
+                        count++;
+                        
+                        let tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50 group cursor-pointer transition";
+                        tr.onclick = () => this.openModal(app.docId);
+                        
+                        tr.innerHTML = `
+                            <td class="p-3">
+                                <div class="font-bold text-slate-800">${app.idNumber || app.docId}</div>
+                                <div class="text-[9px] font-mono text-kipchi-red font-bold">${app.transactionCode || 'N/A'}</div>
+                            </td>
+                            <td class="p-3 font-bold text-slate-800 uppercase">${app.firstName || ''} ${app.lastName || ''}</td>
+                            <td class="p-3">
+                                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${app.division === 'Wholesale' ? 'bg-slate-800 text-white' : 'bg-red-100 text-kipchi-red'}">${app.division || 'Supermarket'}</span>
+                                <div class="text-slate-800 font-medium mt-0.5">${app.jobTitle || 'Role'}</div>
+                            </td>
+                            <td class="p-3 text-slate-600">${app.branch || 'Main'}</td>
+                            <td class="p-3 text-center">${this.getStatusBadge(app.status || 'Under Review')}</td>
+                            <td class="p-3 text-right">
+                                <button class="btn btn-outline py-1 px-2 text-[10px]" onclick="event.stopPropagation(); adminApp.openModal('${app.docId}')">Edit / View</button>
+                                <button class="btn btn-danger py-1 px-2 text-[10px] ml-1" onclick="event.stopPropagation(); adminApp.deleteApplicant('${app.docId}')">🗑️</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+
+                document.getElementById('table-count-info').textContent = `Showing ${count} entries`;
+                if(count === 0) tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No candidate applications match search filters.</td></tr>`;
+            },
+
+            getStatusBadge: function(status) {
+                let css = 'bg-slate-200 text-slate-700';
+                if(status === 'Under Review') css = 'bg-status-review';
+                if(status === 'Interviewing') css = 'bg-status-interview';
+                if(status === 'Hired') css = 'bg-status-hired';
+                if(status === 'Rejected') css = 'bg-status-rejected';
+                return `<span class="badge ${css}">${status}</span>`;
+            },
+
+            openModal: function(docId) {
+                const app = this.applications.find(a => a.docId === docId);
+                if(!app) return;
+                
+                this.currentAppId = docId;
+
+                document.getElementById('mdl-name').textContent = `${app.firstName || ''} ${app.lastName || ''}`;
+                document.getElementById('mdl-id').textContent = `ID: ${app.idNumber || docId}`;
+                document.getElementById('mdl-division-badge').textContent = app.division || 'Supermarket';
+                document.getElementById('mdl-status-badge').outerHTML = `<span id="mdl-status-badge" class="badge ${this.getStatusBadge(app.status || 'Under Review').match(/class="badge (.*?)"/)[1]}">${app.status || 'Under Review'}</span>`;
+                
+                document.getElementById('mdl-role').textContent = app.jobTitle || 'N/A';
+                document.getElementById('mdl-branch').textContent = app.branch || 'Main';
+                document.getElementById('mdl-phone').textContent = app.phone || 'N/A';
+                document.getElementById('mdl-email').textContent = app.email || 'N/A';
+                document.getElementById('mdl-address').textContent = `${app.county || ''} (${app.subcounty || app.address || ''})`;
+                document.getElementById('mdl-education').textContent = app.education || 'N/A';
+                document.getElementById('mdl-experience').textContent = app.experience || 'Entry Level';
+                document.getElementById('mdl-relocate').textContent = app.relocate || 'Flexible';
+                document.getElementById('mdl-start').textContent = app.startDate || 'Immediate';
+                
+                document.getElementById('mdl-mpesa').textContent = app.transactionCode || 'N/A';
+                document.getElementById('mdl-date').textContent = app.timestamp && app.timestamp.toDate ? app.timestamp.toLocaleString() : 'N/A';
+
+                const ansDiv = document.getElementById('mdl-answers');
+                if (app.answers && app.answers.length > 0) {
+                    ansDiv.innerHTML = app.answers.map((ans, i) => `
+                        <div class="bg-white p-2 rounded border border-slate-100">
+                            <p class="font-bold text-slate-700 text-[10px]">Q${i+1}: ${ans.q}</p>
+                            <p class="text-slate-600 italic">"${ans.a}"</p>
+                        </div>
+                    `).join('');
+                } else {
+                    ansDiv.innerHTML = '<p class="text-slate-400 italic text-[10px]">No questionnaire records.</p>';
+                }
+
+                const sel = document.getElementById('mdl-status-select');
+                sel.value = [...sel.options].some(o => o.value === app.status) ? app.status : 'Under Review';
+                document.getElementById('mdl-new-note').value = '';
+
+                const histDiv = document.getElementById('mdl-notes-history');
+                if (app.adminNotes && app.adminNotes.length > 0) {
+                    const sortedNotes = [...app.adminNotes].sort((a,b) => new Date(b.date) - new Date(a.date));
+                    histDiv.innerHTML = sortedNotes.map(n => `
+                        <div class="bg-slate-50 p-2 rounded border border-slate-100 text-[10px]">
+                            <div class="flex justify-between text-slate-400 mb-0.5"><span>Admin HR</span><span>${new Date(n.date).toLocaleString()}</span></div>
+                            <p class="text-slate-700">${n.text}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    histDiv.innerHTML = '<p class="text-slate-400 text-center italic mt-2">No notes recorded yet.</p>';
+                }
+
+                document.getElementById('modal-app-details').classList.add('active');
+            },
+
+            closeModal: function() {
+                document.getElementById('modal-app-details').classList.remove('active');
+                this.currentAppId = null;
+            },
+
+            saveApplicationUpdates: async function() {
+                if(!this.currentAppId || !this.currentUser) return;
+
+                const newStatus = document.getElementById('mdl-status-select').value;
+                const newNoteText = document.getElementById('mdl-new-note').value.trim();
+                
+                const btnText = document.getElementById('mdl-btn-text');
+                const spinner = document.getElementById('mdl-spinner');
+                
+                btnText.textContent = 'Saving...';
+                spinner.classList.remove('hidden');
+
+                try {
+                    const appData = this.applications.find(a => a.docId === this.currentAppId);
+                    const isArtifact = appData.sourcePath === 'artifacts';
+                    
+                    const docRef = isArtifact ? 
+                        doc(this.db, 'artifacts', this.appId, 'public', 'data', 'applications', this.currentAppId) :
+                        doc(this.db, 'applications', this.currentAppId);
+                    
+                    let updates = { status: newStatus };
+                    
+                    if (newNoteText) {
+                        const currentNotes = appData.adminNotes || [];
+                        updates.adminNotes = [
+                            ...currentNotes,
+                            { text: newNoteText, date: new Date().toISOString() }
+                        ];
+                    }
+
+                    await updateDoc(docRef, updates);
+                    this.showToast("Record updated.", "success");
+                    setTimeout(() => this.closeModal(), 400);
+
+                } catch (error) {
+                    console.error("Update error:", error);
+                    this.showToast("Failed to update record.", "error");
+                } finally {
+                    btnText.textContent = 'Save Changes';
+                    spinner.classList.add('hidden');
+                }
+            },
+
+            deleteApplicant: async function(docId) {
+                if (!confirm(`Are you sure you want to PERMANENTLY DELETE application ID: ${docId}?`)) return;
+                try {
+                    const appData = this.applications.find(a => a.docId === docId);
+                    const isArtifact = appData && appData.sourcePath === 'artifacts';
+
+                    const docRef = isArtifact ? 
+                        doc(this.db, 'artifacts', this.appId, 'public', 'data', 'applications', docId) :
+                        doc(this.db, 'applications', docId);
+
+                    await deleteDoc(docRef);
+                    this.showToast(`Application ${docId} deleted.`, "info");
+                } catch(e) {
+                    console.error("Delete error", e);
+                    this.showToast("Delete operation failed.", "error");
+                }
+            },
+
+            deleteCurrentApplicant: function() {
+                if(this.currentAppId) {
+                    const id = this.currentAppId;
+                    this.closeModal();
+                    this.deleteApplicant(id);
+                }
+            },
+
+            exportCSV: function() {
+                if (this.applications.length === 0) {
+                    this.showToast("No records available to export.", "error");
+                    return;
+                }
+
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "ID Number,First Name,Last Name,Phone,Email,County,Education,Division,Role,Station,Status,M-PESA Code,Applied Date\n";
+
+                this.applications.forEach(app => {
+                    const dateStr = app.timestamp && app.timestamp.toDate ? app.timestamp.toDate().toLocaleString().replace(/,/g, '') : '';
+                    const clean = (str) => `"${(str || '').toString().replace(/"/g, '""')}"`;
+                    
+                    const row = [
+                        clean(app.idNumber || app.docId),
+                        clean(app.firstName),
+                        clean(app.lastName),
+                        clean(app.phone),
+                        clean(app.email),
+                        clean(app.county),
+                        clean(app.education),
+                        clean(app.division),
+                        clean(app.jobTitle),
+                        clean(app.branch),
+                        clean(app.status),
+                        clean(app.transactionCode),
+                        clean(dateStr)
+                    ].join(",");
+                    
+                    csvContent += row + "\n";
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `Kipchimatt_Recruitment_${new Date().toISOString().slice(0,10)}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showToast("CSV export downloaded successfully.", "success");
+            }
+        };
+    </script>
+</body>
+</html>
