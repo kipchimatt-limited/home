@@ -1,0 +1,1377 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kipchimatt Supermarket & Wholesale | Careers & Online Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        kipchi: {
+                            red: '#dc2626',
+                            darkRed: '#991b1b',
+                            black: '#0f172a',
+                            light: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Compact UI styling */
+        body { font-size: 13px; background-color: #f8fafc; color: #334155; }
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .form-input {
+            width: 100%; border: 1px solid #cbd5e1; border-radius: 0.25rem; padding: 0.3rem 0.5rem;
+            font-size: 0.75rem; outline: none; transition: all 0.2s; height: 32px; background: white;
+        }
+        .form-input:focus { border-color: #dc2626; box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1); }
+        .form-input:invalid:not(:placeholder-shown) { border-color: #ef4444; }
+        .form-label { display: block; font-size: 0.65rem; font-weight: 600; color: #475569; margin-bottom: 0.15rem; text-transform: uppercase; letter-spacing: 0.025em; }
+        
+        .btn-primary { background-color: #dc2626; color: white; padding: 0.4rem 0.75rem; border-radius: 0.25rem; font-weight: 600; text-align: center; transition: background-color 0.2s; cursor: pointer; font-size: 0.75rem; border: none; }
+        .btn-primary:hover:not(:disabled) { background-color: #991b1b; }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        
+        .btn-black { background-color: #0f172a; color: white; padding: 0.4rem 0.75rem; border-radius: 0.25rem; font-weight: 600; text-align: center; transition: background-color 0.2s; cursor: pointer; font-size: 0.75rem; border: none; }
+        .btn-black:hover:not(:disabled) { background-color: #1e293b; }
+        
+        .btn-outline { border: 1px solid #cbd5e1; color: #475569; padding: 0.4rem 0.75rem; border-radius: 0.25rem; font-weight: 600; text-align: center; transition: all 0.2s; cursor: pointer; font-size: 0.75rem; background: transparent; }
+        .btn-outline:hover { background-color: #f1f5f9; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #dc2626; border-radius: 4px; }
+        
+        /* Toast Notification */
+        #toast-container { position: fixed; top: 4rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+        .toast { padding: 0.5rem 0.75rem; border-radius: 0.25rem; color: white; font-weight: 500; font-size: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out forwards; max-width: 300px; line-height: 1.4; }
+        .toast.success { background-color: #10b981; }
+        .toast.error { background-color: #ef4444; }
+        .toast.info { background-color: #3b82f6; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .spinner { width: 14px; height: 14px; border: 2px solid white; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- NAVIGATION -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="app.navigate('home')">
+                <div class="w-8 h-8 bg-kipchi-red rounded flex items-center justify-center text-white font-bold text-lg leading-none pt-0.5 shadow-sm">K</div>
+                <div class="flex flex-col leading-none">
+                    <span class="font-extrabold text-kipchi-black text-sm tracking-tight">KIPCHIMATT</span>
+                    <span class="text-[9px] text-kipchi-red uppercase font-bold tracking-widest">Supermarket & Wholesale</span>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex gap-5 text-xs font-semibold text-slate-600">
+                <a class="hover:text-kipchi-red cursor-pointer transition" onclick="app.navigate('home')">Home</a>
+                <a class="hover:text-kipchi-red cursor-pointer transition" onclick="app.navigate('wholesale')">Wholesale Deals</a>
+                <a class="hover:text-kipchi-red cursor-pointer transition" onclick="app.navigate('about')">About Us</a>
+                <a class="hover:text-kipchi-red cursor-pointer transition" onclick="app.navigate('contact')">Contact</a>
+                <a class="text-kipchi-red border-b-2 border-kipchi-red cursor-pointer transition pb-1 font-bold" onclick="app.navigate('careers')">Careers Portal</a>
+            </div>
+
+            <div class="hidden md:flex gap-2">
+                <button class="btn-outline text-[10px] py-1 px-2" onclick="app.navigate('wholesale')">Bulk Order Login</button>
+                <button class="btn-primary text-[10px] py-1 px-2 flex gap-1 items-center" onclick="app.navigate('careers')">
+                    Apply For Jobs
+                </button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden text-slate-600 focus:outline-none p-1" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-50 border-t border-slate-200 px-4 py-3 flex flex-col gap-3 text-xs font-semibold shadow-inner">
+            <a class="cursor-pointer hover:text-kipchi-red flex items-center gap-2" onclick="app.navigate('home'); this.parentElement.classList.add('hidden')"><span>🏠</span> Home</a>
+            <a class="cursor-pointer hover:text-kipchi-red flex items-center gap-2" onclick="app.navigate('wholesale'); this.parentElement.classList.add('hidden')"><span>📦</span> Wholesale Catalog</a>
+            <a class="cursor-pointer hover:text-kipchi-red flex items-center gap-2" onclick="app.navigate('about'); this.parentElement.classList.add('hidden')"><span>📖</span> About Kipchimatt</a>
+            <a class="cursor-pointer hover:text-kipchi-red flex items-center gap-2" onclick="app.navigate('contact'); this.parentElement.classList.add('hidden')"><span>📞</span> Contact Us</a>
+            <a class="text-kipchi-red cursor-pointer flex items-center gap-2 bg-red-50 p-2 rounded" onclick="app.navigate('careers'); this.parentElement.classList.add('hidden')"><span>💼</span> Careers Portal</a>
+        </div>
+    </nav>
+
+    <div id="toast-container"></div>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="w-full flex-grow">
+        
+        <!-- ================= HOME PAGE ================= -->
+        <section id="page-home" class="page-section">
+            <div class="bg-gradient-to-r from-kipchi-black via-slate-900 to-kipchi-darkRed text-white">
+                <div class="max-w-6xl mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="max-w-xl text-center md:text-left">
+                        <span class="bg-kipchi-red px-2.5 py-1 rounded text-[9px] font-bold uppercase tracking-widest mb-4 inline-block text-white shadow">Grand Opening Announcement</span>
+                        <h1 class="text-3xl md:text-5xl font-extrabold mb-4 leading-tight tracking-tight">Eldoret Mega Branch Opening Soon!</h1>
+                        <p class="text-xs md:text-sm opacity-90 mb-6 font-medium leading-relaxed">We are expanding our foot print to Uasin Gishu County! Over 150+ operational and administrative vacancies are now open for our upcoming Eldoret Hypermarket & Wholesale Hub.</p>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                            <button class="btn-primary px-6 py-2.5 text-xs shadow-lg" onclick="app.navigate('careers')">Apply For Eldoret & Countrywide Jobs</button>
+                            <button class="bg-white text-kipchi-black px-6 py-2.5 rounded font-bold text-xs hover:bg-slate-100 transition shadow" onclick="app.navigate('wholesale')">Explore Wholesale Rates</button>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-80 bg-white/10 backdrop-blur-md p-5 rounded-xl border border-white/20 text-center shadow-2xl">
+                        <h3 class="font-bold text-sm mb-1 text-kipchi-red uppercase tracking-wider">Eldoret Mega Branch</h3>
+                        <p class="text-[10px] text-slate-300 mb-3">Uganda Road, Opposite Zion Mall</p>
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                            <div class="bg-white/10 p-3 rounded cursor-pointer hover:bg-white/20 transition border border-white/10" onclick="app.navigate('careers')">
+                                <div class="text-xl mb-1">🛒</div>
+                                <div class="text-[11px] font-bold">Supermarket</div>
+                                <div class="text-[9px] text-red-300 font-semibold">65+ Openings</div>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded cursor-pointer hover:bg-white/20 transition border border-white/10" onclick="app.navigate('careers')">
+                                <div class="text-2xl mb-1">🏬</div>
+                                <div class="text-[11px] font-bold">Wholesale Depot</div>
+                                <div class="text-[9px] text-red-300 font-semibold">40+ Openings</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eldoret Banner Highlight -->
+            <div class="bg-red-50 border-y border-red-200 py-3">
+                <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-red-900 font-semibold">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-kipchi-red text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded animate-pulse">Hot Alert</span>
+                        <span>Mass Recruitment in Progress for Eldoret Branch Opening!</span>
+                    </div>
+                    <button class="text-kipchi-red hover:underline font-bold text-[11px]" onclick="app.navigate('careers')">View Eldoret Positions →</button>
+                </div>
+            </div>
+
+            <!-- Features Bar -->
+            <div class="bg-white border-b border-slate-200 py-6">
+                <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="p-2 border-r border-slate-100 last:border-none">
+                        <h4 class="font-extrabold text-kipchi-red text-2xl">28+</h4>
+                        <p class="text-[10px] uppercase font-bold text-slate-500 mt-1">Branches Nationwide</p>
+                    </div>
+                    <div class="p-2 border-r border-slate-100 last:border-none">
+                        <h4 class="font-extrabold text-kipchi-black text-2xl">Fair & Equal</h4>
+                        <p class="text-[10px] uppercase font-bold text-slate-500 mt-1">Inclusive Recruitment</p>
+                    </div>
+                    <div class="p-2 border-r border-slate-100 last:border-none">
+                        <h4 class="font-extrabold text-kipchi-red text-2xl">6,500+</h4>
+                        <p class="text-[10px] uppercase font-bold text-slate-500 mt-1">Workforce Members</p>
+                    </div>
+                    <div class="p-2">
+                        <h4 class="font-extrabold text-kipchi-black text-2xl">100% Online</h4>
+                        <p class="text-[10px] uppercase font-bold text-slate-500 mt-1">Status Tracking</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Company Overview Cards -->
+            <div class="max-w-6xl mx-auto px-4 py-10">
+                <h2 class="text-xl font-bold text-slate-800 mb-6 text-center">Why Build Your Career At Kipchimatt?</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col">
+                        <div class="w-10 h-10 bg-red-100 text-kipchi-red rounded-lg flex items-center justify-center font-bold text-xl mb-3">📈</div>
+                        <h3 class="font-bold text-slate-800 text-sm mb-2">Rapid Regional Growth</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-4">With multiple branch launches yearly across South Rift, Western, and Nyanza, working with us provides internal promotion and transfer avenues.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col">
+                        <div class="w-10 h-10 bg-slate-100 text-slate-800 rounded-lg flex items-center justify-center font-bold text-xl mb-3">🤝</div>
+                        <h3 class="font-bold text-slate-800 text-sm mb-2">Community Empowerment</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-4">We prioritize local talent recruitment for every new branch we open, ensuring direct economic upliftment in our immediate communities.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm flex flex-col">
+                        <div class="w-10 h-10 bg-red-100 text-kipchi-red rounded-lg flex items-center justify-center font-bold text-xl mb-3">🏆</div>
+                        <h3 class="font-bold text-slate-800 text-sm mb-2">Competitive Benefits</h3>
+                        <p class="text-xs text-slate-500 leading-relaxed mb-4">We offer fair wages, health coverage, staff shopping discounts, and continuous skill advancement training for all employees.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= WHOLESALE PAGE ================= -->
+        <section id="page-wholesale" class="page-section">
+            <div class="max-w-5xl mx-auto px-4 py-10">
+                <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm border border-slate-200 mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-4 mb-6">
+                        <div>
+                            <span class="text-naivas-orange text-[10px] uppercase font-bold tracking-widest">B2B Supply Network</span>
+                            <h2 class="text-2xl font-bold text-kipchi-red">Kipchimatt Wholesale Division</h2>
+                        </div>
+                        <button class="btn-primary mt-2 md:mt-0 text-xs" onclick="app.navigate('careers')">Apply For Wholesale Jobs</button>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-6 leading-relaxed">Kipchimatt Wholesale operates high-capacity storage warehouses across Kericho, Nakuru, Kisumu, Bomet, and the upcoming Eldoret Depot. We distribute directly to retail shops, institutions, hotels, and schools.</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                            <span class="text-3xl mb-2 block">🌾</span>
+                            <h4 class="font-bold text-xs uppercase text-slate-800 mb-1">Grains & Mill Products</h4>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">Bulk bags of maize flour, unga, grade 1 rice, sugar, salt, and baking flour in 10kg, 25kg, and 50kg packs.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                            <span class="text-3xl mb-2 block">🧼</span>
+                            <h4 class="font-bold text-xs uppercase text-slate-800 mb-1">FMCG & Hygiene</h4>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">Full cartons of bar soap, washing powders, tissue papers, personal care, and disinfectant lines.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                            <span class="text-3xl mb-2 block">🧃</span>
+                            <h4 class="font-bold text-xs uppercase text-slate-800 mb-1">Beverages & Edible Oils</h4>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">Wholesale jerrycans of cooking oil (3L to 20L), crates of sodas, juices, tea leaves, and confectionery items.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 text-white p-6 rounded-lg shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="font-bold text-sm text-red-400 uppercase tracking-wider">Eldoret Wholesale Depot Hiring</h3>
+                        <p class="text-xs text-slate-300">We are recruiting warehouse managers, forklift drivers, inventory clerks, and loaders for the Eldoret depot.</p>
+                    </div>
+                    <button class="btn-primary whitespace-nowrap px-4 py-2" onclick="app.navigate('careers')">Join Wholesale Team</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ABOUT PAGE ================= -->
+        <section id="page-about" class="page-section">
+            <div class="max-w-4xl mx-auto px-4 py-10">
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 md:p-10">
+                    <h2 class="text-2xl font-bold text-kipchi-black mb-4 border-b border-slate-100 pb-3">About Kipchimatt Supermarket & Wholesale</h2>
+                    <div class="prose prose-sm text-slate-600 space-y-4">
+                        <p>Kipchimatt Supermarket and Wholesale is a premier retail and bulk distribution giant headquartered in Kericho, Kenya. Established with a commitment to providing high quality everyday essentials at affordable rates, Kipchimatt has expanded aggressively across South Rift, Western, Nyanza, and Uasin Gishu counties.</p>
+                        <p>Our operational model combines modern hypermarkets with heavy-duty wholesale warehouses, allowing us to serve both individual retail shoppers and bulk trade businesses under one brand umbrella.</p>
+                        
+                        <h3 class="font-bold text-slate-800 text-lg mt-6">Our Mission & Vision</h3>
+                        <p><strong>Mission:</strong> To supply top-grade groceries, household products, and consumer goods at manufacturer-direct prices while generating employment and economic value in local Kenyan towns.</p>
+                        <p><strong>Vision:</strong> To become the leading retail and wholesale footprint in Western Kenya through continuous innovation, branch expansion, and community trust.</p>
+
+                        <h3 class="font-bold text-slate-800 text-lg mt-6 mb-2">Our Core Principles</h3>
+                        <div class="grid md:grid-cols-3 gap-4 mt-2">
+                            <div class="bg-slate-50 p-3 rounded border border-slate-100">
+                                <strong class="text-kipchi-red block mb-1 text-sm">Affordability</strong>
+                                <span class="text-xs">Unbeatable pricing across both retail shelves and wholesale bulk packs.</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded border border-slate-100">
+                                <strong class="text-kipchi-red block mb-1 text-sm">Opportunity</strong>
+                                <span class="text-xs">Creating fair, inclusive jobs for Kenyans at every qualification level.</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded border border-slate-100">
+                                <strong class="text-kipchi-red block mb-1 text-sm">Integrity</strong>
+                                <span class="text-xs">Transparent customer care, genuine stock sourcing, and ethical employment.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CONTACT PAGE ================= -->
+        <section id="page-contact" class="page-section">
+            <div class="max-w-5xl mx-auto px-4 py-10">
+                <h2 class="text-2xl font-bold text-slate-800 mb-6">Contact Us & Branch Directory</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-sm text-slate-800 uppercase tracking-wider mb-4">Send Us A Direct Inquiry</h3>
+                        <form onsubmit="event.preventDefault(); app.showToast('Inquiry sent successfully! Our HR team will reach out.', 'success'); this.reset();" class="space-y-3">
+                            <div><label class="form-label">Full Name *</label><input type="text" required class="form-input"></div>
+                            <div><label class="form-label">Phone Number *</label><input type="tel" required class="form-input"></div>
+                            <div><label class="form-label">Email Address</label><input type="email" class="form-input"></div>
+                            <div>
+                                <label class="form-label">Branch of Interest</label>
+                                <select required class="form-input bg-white text-xs">
+                                    <option value="Eldoret Branch (New)">Eldoret Branch (New Opening)</option>
+                                    <option value="Kericho Head Office">Kericho Head Office</option>
+                                    <option value="Nakuru Branch">Nakuru Branch</option>
+                                    <option value="Kisumu Outlet">Kisumu Outlet</option>
+                                    <option value="Bomet Branch">Bomet Branch</option>
+                                    <option value="General Recruitment">General Recruitment Query</option>
+                                </select>
+                            </div>
+                            <div><label class="form-label">Message *</label><textarea required class="form-input" style="height: 70px; resize: none;"></textarea></div>
+                            <button type="submit" class="btn-primary w-full mt-2">Submit Inquiry</button>
+                        </form>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-sm text-kipchi-red uppercase tracking-wider mb-2">Kericho Headquarters</h3>
+                            <p class="text-xs text-slate-600 mb-1"><strong>Address:</strong> Kipchimatt Building, Temple Road, P.O. Box 450, Kericho.</p>
+                            <p class="text-xs text-slate-600 mb-1"><strong>HR Direct Phone:</strong> 0720 000 111 / 0735 000 222</p>
+                            <p class="text-xs text-slate-600"><strong>Recruitment Email:</strong> careers@kipchimatt.co.ke</p>
+                        </div>
+
+                        <div class="bg-red-50 p-5 rounded-lg border border-red-200">
+                            <h3 class="font-bold text-sm text-kipchi-darkRed uppercase tracking-wider mb-2">Upcoming Eldoret Branch Office</h3>
+                            <p class="text-xs text-slate-700 mb-1"><strong>Address:</strong> Uganda Road, Opposite Zion Mall, Eldoret CBD.</p>
+                            <p class="text-xs text-slate-700"><strong>Recruitment Helpdesk:</strong> 0711 999 888 (Eldoret Recruitment)</p>
+                        </div>
+
+                        <div class="bg-slate-800 text-white p-5 rounded-lg shadow-sm">
+                            <h3 class="font-bold text-sm text-naivas-orange uppercase tracking-wider mb-2">Customer Care & General Help</h3>
+                            <p class="text-xs text-slate-300 mb-2">Monday – Saturday: 7:30 AM to 8:00 PM</p>
+                            <p class="text-base font-bold">📞 0800 700 999 <span class="text-[10px] font-normal text-slate-400">(Toll-Free Support)</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= CAREERS PORTAL ================= -->
+        <section id="page-careers" class="page-section active bg-slate-50 min-h-screen pb-12">
+            
+            <div class="bg-kipchi-black text-white pt-10 pb-16 px-4">
+                <div class="max-w-5xl mx-auto text-center">
+                    <span class="bg-kipchi-red text-white text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded mb-3 inline-block">Official Recruitment Portal</span>
+                    <h2 class="text-3xl font-extrabold mb-2">Kipchimatt Recruitment Portal</h2>
+                    <p class="text-xs text-slate-300 max-w-2xl mx-auto">Equal opportunity employer recruiting for Supermarket Outlets and Wholesale Depots countrywide. High vacancy allocation for our upcoming Eldoret Branch!</p>
+                </div>
+            </div>
+
+            <div class="max-w-5xl mx-auto px-4 -mt-8">
+                <!-- Header Actions -->
+                <div class="flex flex-col md:flex-row justify-center gap-3 bg-white p-3 rounded-lg shadow border border-slate-200 mb-6 max-w-md mx-auto">
+                    <button class="btn-outline flex-1 py-2 text-xs" onclick="app.careers.showView('statusCheck')">🔍 Check Status</button>
+                    <button class="btn-primary flex-1 py-2 text-xs" onclick="app.careers.showView('jobList')">💼 View Vacancies</button>
+                </div>
+
+                <!-- Careers Views Container -->
+                <div id="careers-content" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
+                    
+                    <!-- View 1: Job List -->
+                    <div id="view-jobList" class="p-4 md:p-6">
+                        
+                        <!-- Division Toggle Tabs -->
+                        <div class="flex border-b border-slate-200 mb-6 gap-2">
+                            <button id="tab-supermarket" class="py-2.5 px-4 font-bold text-xs border-b-2 border-kipchi-red text-kipchi-red flex items-center gap-2 cursor-pointer transition" onclick="app.careers.switchDivision('supermarket')">
+                                🛒 Supermarket Roles <span id="badge-sup-count" class="bg-red-100 text-kipchi-red text-[9px] px-2 py-0.5 rounded-full font-bold">13 Openings</span>
+                            </button>
+                            <button id="tab-wholesale" class="py-2.5 px-4 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition" onclick="app.careers.switchDivision('wholesale')">
+                                🏬 Wholesale Warehouse Roles <span id="badge-who-count" class="bg-slate-100 text-slate-600 text-[9px] px-2 py-0.5 rounded-full font-bold">11 Openings</span>
+                            </button>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 id="division-title" class="font-bold text-base text-slate-800">Supermarket Outlets - Open Vacancies</h3>
+                            <span class="text-[9px] bg-red-100 text-kipchi-darkRed px-2.5 py-1 rounded font-bold uppercase tracking-wider">Fast-Track Hiring</span>
+                        </div>
+
+                        <div id="job-list-container" class="grid sm:grid-cols-2 gap-4">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- View 2: Status Check -->
+                    <div id="view-statusCheck" class="p-6 md:p-10 hidden">
+                        <div class="max-w-md mx-auto">
+                            <div class="text-center mb-6">
+                                <div class="inline-flex items-center justify-center w-12 h-12 bg-red-50 text-kipchi-red rounded-full mb-3 text-xl font-bold">🔍</div>
+                                <h3 class="font-bold text-lg">Check Application Status</h3>
+                                <p class="text-xs text-slate-500 mt-1">Enter your details exactly as provided during application.</p>
+                            </div>
+                            
+                            <form class="space-y-4" onsubmit="event.preventDefault(); app.careers.checkStatus();">
+                                <div>
+                                    <label class="form-label">National ID / Passport Number</label>
+                                    <input type="text" id="status-id" class="form-input" required placeholder="e.g. 12345678" pattern="[A-Za-z0-9]{6,10}">
+                                </div>
+                                <div>
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" id="status-lastname" class="form-input" required placeholder="e.g. Kiprono">
+                                </div>
+                                <button type="submit" class="btn-primary w-full py-2 flex justify-center items-center gap-2">
+                                    Fetch Status <span id="status-spinner" class="spinner hidden"></span>
+                                </button>
+                            </form>
+
+                            <div id="status-result" class="mt-6 hidden bg-slate-50 p-4 rounded border border-slate-200 text-center min-h-[100px] flex items-center justify-center">
+                                <!-- Populated by JS -->
+                            </div>
+                            <div class="text-center mt-4">
+                                <button class="text-xs text-slate-500 hover:text-kipchi-red underline" onclick="app.careers.showView('jobList')">Back to Vacancies</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View 3: Application Form -->
+                    <div id="view-applyForm" class="p-4 md:p-6 hidden">
+                        <button class="text-[10px] font-bold text-slate-500 mb-4 flex items-center hover:text-kipchi-red uppercase tracking-wide" onclick="app.careers.showView('jobList')">
+                            ← Back to Listings
+                        </button>
+                        
+                        <div class="bg-red-50/60 p-3 rounded-lg border border-red-100 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div>
+                                <span class="text-[9px] uppercase font-bold text-kipchi-red tracking-wider">Applying for:</span>
+                                <h3 id="form-job-title" class="font-bold text-slate-800 text-sm">Role Title</h3>
+                            </div>
+                            <div class="sm:text-right">
+                                <span class="text-[9px] uppercase font-bold text-kipchi-red tracking-wider">Station & Division:</span>
+                                <h3 id="form-job-branch" class="font-bold text-slate-800 text-sm">Branch</h3>
+                            </div>
+                        </div>
+
+                        <!-- Job Qualifications Display Box -->
+                        <div class="bg-slate-50 p-3 rounded border border-slate-200 mb-6">
+                            <h4 class="font-bold text-[11px] text-slate-700 uppercase tracking-wider mb-2">Role Qualifications & Requirements</h4>
+                            <ul id="form-job-qualifications" class="list-disc list-inside text-xs text-slate-600 space-y-1">
+                                <!-- Populated by JS -->
+                            </ul>
+                        </div>
+
+                        <form id="main-application-form" onsubmit="event.preventDefault(); app.careers.processForm();">
+                            <h4 class="font-bold text-[11px] text-slate-500 uppercase tracking-wider border-b pb-1 mb-3">1. Personal Information & Demographics</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                                <div><label class="form-label">First Name *</label><input type="text" id="f_fname" required class="form-input" pattern="[A-Za-z\s]{2,50}"></div>
+                                <div><label class="form-label">Last Name *</label><input type="text" id="f_lname" required class="form-input" pattern="[A-Za-z\s]{2,50}"></div>
+                                <div><label class="form-label">National ID *</label><input type="text" id="f_id" required class="form-input" pattern="[0-9]{6,10}" title="6-10 digit ID number"></div>
+                                <div><label class="form-label">Date of Birth *</label><input type="date" id="f_dob" required class="form-input" max="2008-12-31" title="Must be at least 18 years old"></div>
+                                
+                                <div><label class="form-label">Phone Number *</label><input type="tel" id="f_phone" required class="form-input" placeholder="07XX XXX XXX" pattern="^(?:254|\+254|0)?(7[0-9]{8}|1[0-9]{8})$"></div>
+                                <div><label class="form-label">Email Address (Optional)</label><input type="email" id="f_email" class="form-input" placeholder="name@email.com"></div>
+                                <div>
+                                    <label class="form-label">County of Residence *</label>
+                                    <select id="f_county" required class="form-input bg-white cursor-pointer text-xs">
+                                        <option value="" disabled selected>Select County...</option>
+                                        <!-- Populated by JS -->
+                                    </select>
+                                </div>
+                                <div><label class="form-label">Sub-County / Location *</label><input type="text" id="f_subcounty" required class="form-input" placeholder="e.g. Kapseret, Eldoret"></div>
+
+                                <div><label class="form-label">Current Postal Address *</label><input type="text" id="f_address" required class="form-input" placeholder="P.O. Box ..."></div>
+                                <div>
+                                    <label class="form-label">Highest Level of Education *</label>
+                                    <select id="f_education" required class="form-input bg-white cursor-pointer text-xs">
+                                        <option value="" disabled selected>Select Education...</option>
+                                        <option value="Primary Education Certificate">Primary Education Certificate</option>
+                                        <option value="Secondary Education Certificate">Secondary Education Certificate</option>
+                                        <option value="Vocational / Certificate">Vocational / Certificate</option>
+                                        <option value="Diploma Holder">Diploma Holder</option>
+                                        <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Years of Retail/Work Experience *</label>
+                                    <select id="f_experience" required class="form-input bg-white cursor-pointer text-xs">
+                                        <option value="No experience (Entry Level)">No experience (Entry Level)</option>
+                                        <option value="1 - 2 Years">1 - 2 Years</option>
+                                        <option value="3 - 5 Years">3 - 5 Years</option>
+                                        <option value="Over 5 Years">Over 5 Years</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Willingness to Relocate / Shift Work *</label>
+                                    <select id="f_relocate" required class="form-input bg-white cursor-pointer text-xs">
+                                        <option value="Yes - Fully Flexible">Yes - Fully Flexible</option>
+                                        <option value="Day Shifts Only">Day Shifts Only</option>
+                                        <option value="Local Station Only">Local Station Only</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <h4 class="font-bold text-[11px] text-slate-500 uppercase tracking-wider border-b pb-1 mb-3">2. Job Specific Questionnaire & Documents</h4>
+                            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="form-label">When are you available to start work? *</label>
+                                        <select id="f_start_date" required class="form-input bg-white cursor-pointer text-xs">
+                                            <option value="" disabled selected>Select option...</option>
+                                            <option value="Immediately">Immediately</option>
+                                            <option value="Within 1 Week">Within 1 Week</option>
+                                            <option value="Within 2 Weeks">Within 2 Weeks</option>
+                                            <option value="1 Month Notice">1 Month Notice</option>
+                                        </select>
+                                    </div>
+                                    <div id="dynamic-questions-container" class="space-y-3">
+                                        <!-- Populated by JS -->
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="form-label">Upload Cover Letter / Resume / ID Copy (Optional)</label>
+                                    <div class="border border-dashed border-slate-300 rounded p-4 text-center cursor-pointer hover:border-kipchi-red hover:bg-slate-50 transition h-[calc(100%-20px)] flex flex-col justify-center items-center" id="upload-zone" onclick="document.getElementById('f_cv').click()">
+                                        <div class="text-2xl mb-1 text-slate-400">📄</div>
+                                        <p class="text-[10px] text-slate-600 font-semibold">Click to upload document (PDF, JPG, PNG, DOCX)</p>
+                                        <input type="file" id="f_cv" class="hidden" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="app.careers.handleFileUpload(this)">
+                                        
+                                        <!-- Progress Bar -->
+                                        <div id="upload-progress-container" class="hidden mt-3 w-full max-w-[200px] mx-auto">
+                                            <div class="w-full bg-slate-200 rounded-full h-1">
+                                                <div id="upload-progress-bar" class="bg-kipchi-red h-1 rounded-full transition-all duration-200" style="width: 0%"></div>
+                                            </div>
+                                            <p id="upload-status-text" class="text-[9px] text-slate-500 mt-1">Uploading... 0%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-2 mb-6 bg-slate-100 p-2.5 rounded text-[10px] text-slate-600 border border-slate-200">
+                                <input type="checkbox" required class="mt-0.5 cursor-pointer">
+                                <p>I declare that all information given is accurate and complete. I authorize Kipchimatt Ltd to process my details for job placement under Kenya Data Protection regulations.</p>
+                            </div>
+
+                            <div class="flex justify-end gap-3 border-t pt-4">
+                                <button type="button" class="btn-outline py-1.5" onclick="app.careers.showView('jobList')">Cancel</button>
+                                <button type="submit" class="btn-primary py-1.5 px-6">Preview Application</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- View 4: Preview -->
+                    <div id="view-preview" class="p-6 md:p-10 hidden">
+                        <div class="max-w-2xl mx-auto">
+                            <h3 class="font-bold text-lg mb-1 text-center">Review Application</h3>
+                            <p class="text-xs text-slate-500 text-center mb-6">Check your details before proceeding to submission verification.</p>
+                            
+                            <div class="bg-slate-50 rounded border border-slate-200 text-xs shadow-inner mb-6">
+                                <div class="bg-slate-900 text-white p-2 font-bold border-b border-slate-200 uppercase tracking-wide text-[10px] flex justify-between">
+                                    <span>Selected Position</span>
+                                    <span id="prev_division_badge" class="bg-kipchi-red px-1.5 rounded text-[9px]">Supermarket</span>
+                                </div>
+                                <div class="p-3 grid grid-cols-2 gap-2">
+                                    <div class="text-slate-500">Role:</div><div class="font-semibold text-kipchi-red" id="prev_role"></div>
+                                    <div class="text-slate-500">Location:</div><div class="font-semibold" id="prev_branch"></div>
+                                </div>
+                                
+                                <div class="bg-slate-200 p-2 font-bold text-slate-700 border-y border-slate-200 uppercase tracking-wide text-[10px]">Personal Info</div>
+                                <div class="p-3 grid grid-cols-2 sm:grid-cols-4 gap-y-2 gap-x-2">
+                                    <div class="text-slate-500">Name:</div><div class="font-semibold col-span-1 sm:col-span-3 uppercase" id="prev_name"></div>
+                                    <div class="text-slate-500">ID Number:</div><div class="font-semibold" id="prev_id"></div>
+                                    <div class="text-slate-500">Phone:</div><div class="font-semibold" id="prev_phone"></div>
+                                    <div class="text-slate-500">County:</div><div class="font-semibold" id="prev_county"></div>
+                                    <div class="text-slate-500">Education:</div><div class="font-semibold" id="prev_edu"></div>
+                                    <div class="text-slate-500">Experience:</div><div class="font-semibold" id="prev_exp"></div>
+                                </div>
+
+                                <div class="bg-slate-200 p-2 font-bold text-slate-700 border-y border-slate-200 uppercase tracking-wide text-[10px]">Questionnaire</div>
+                                <div class="p-3 space-y-2" id="prev_answers"></div>
+                            </div>
+                            
+                            <div class="flex justify-center gap-3">
+                                <button class="btn-outline py-2 px-4" onclick="app.careers.showView('applyForm')">✎ Edit Details</button>
+                                <button class="btn-primary py-2 px-6" onclick="app.careers.showPayment()">Proceed to Submission →</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View 5: Payment / Verification -->
+                    <div id="view-payment" class="p-6 md:p-10 hidden">
+                        <div class="max-w-sm mx-auto text-center">
+                            <div class="w-12 h-12 bg-red-100 text-kipchi-red rounded-full flex items-center justify-center mx-auto mb-3 text-xl font-bold">💳</div>
+                            <h3 class="font-bold text-lg mb-1">System Verification Fee</h3>
+                            <p class="text-[11px] text-slate-500 mb-5 leading-relaxed">A standard verification fee is required for <strong id="pay_div_label" class="text-slate-800">Supermarket</strong> application processing.</p>
+                            
+                            <div class="bg-slate-50 p-4 rounded border border-slate-200 mb-5 text-left space-y-2 text-xs shadow-sm">
+                                <div class="flex justify-between items-center"><span class="text-slate-500 font-semibold">Amount to Pay:</span><strong class="text-sm text-kipchi-red">Ksh <span id="pay_fee">...</span></strong></div>
+                                <div class="flex justify-between items-center border-t border-slate-100 pt-2"><span class="text-slate-500">1. Open M-PESA Menu &rarr; Lipa na M-PESA</span></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-500">2. Select <strong id="pay_method">...</strong></span></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-500">3. Enter Number:</span><strong id="pay_number" class="text-kipchi-black bg-slate-200 px-1.5 rounded tracking-widest text-xs font-mono">...</strong></div>
+                                <div class="flex justify-between items-center"><span class="text-slate-500">4. Account Number:</span><strong class="text-xs">Your ID (<span id="pay_acc_hint"></span>)</strong></div>
+                            </div>
+
+                            <form onsubmit="event.preventDefault(); app.careers.submitFinalApplication();">
+                                <div class="text-left mb-5">
+                                    <label class="form-label">Enter M-PESA Transaction Code *</label>
+                                    <input type="text" id="f_trans_code" required class="form-input font-mono uppercase tracking-widest text-center text-sm font-bold" placeholder="e.g. QKT1234567" pattern="^[A-Z0-9]{10}$" maxlength="10">
+                                </div>
+                                
+                                <button id="btn_final_submit" type="submit" class="btn-primary w-full py-2.5 flex items-center justify-center gap-2 text-sm">
+                                    <span>Verify & Complete Application</span>
+                                    <div id="spinner" class="spinner hidden"></div>
+                                </button>
+                                <p class="text-[9px] text-slate-400 mt-3">Kipchimatt Supermarkets Ltd Recruitment Portal.</p>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- View 6: Success -->
+                    <div id="view-success" class="p-10 md:p-16 hidden text-center">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm">
+                            ✓
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900 mb-2">Application Submitted!</h2>
+                        <p class="text-xs text-slate-500 max-w-sm mx-auto mb-6 leading-relaxed">Your application and M-PESA transaction code have been registered successfully. You can track your status anytime using your National ID.</p>
+                        
+                        <div class="bg-slate-50 inline-block p-4 rounded border border-slate-200 text-left text-xs mb-6 shadow-inner">
+                            <span class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Application Summary:</span>
+                            ID Number: <strong id="succ_id" class="text-slate-800"></strong><br>
+                            Last Name: <strong id="succ_name" class="text-slate-800 uppercase"></strong><br>
+                            Division: <strong id="succ_division" class="text-kipchi-red uppercase"></strong>
+                        </div>
+                        <br>
+                        <button class="btn-primary text-xs" onclick="app.careers.showView('jobList')">Back to Jobs Listing</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-kipchi-black text-white py-8 border-t-[4px] border-kipchi-red mt-auto">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <div class="flex justify-center items-center gap-2 mb-3">
+                <div class="w-6 h-6 bg-kipchi-red rounded flex items-center justify-center font-bold text-sm leading-none pt-0.5">K</div>
+                <span class="font-extrabold text-white text-base">KIPCHIMATT</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-4 max-w-md mx-auto">Supermarkets & Wholesale Distributors. Quality Products & Wholesale Savings Nationwide.</p>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest">&copy; 2024 Kipchimatt Limited. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Setup Firebase parameters using provided config
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'kipchimatt-portal';
+        let firebaseConfig;
+
+        const userProvidedConfig = {
+            apiKey: "AIzaSyAXOvScQp_iMQIgBeb0RgaDPq8BoF7y7OQ",
+            authDomain: "kipchi.firebaseapp.com",
+            projectId: "kipchi",
+            storageBucket: "kipchi.firebasestorage.app",
+            messagingSenderId: "140401878759",
+            appId: "1:140401878759:web:b1e8ab17a9f39d0957a442"
+        };
+
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } else {
+            firebaseConfig = userProvidedConfig;
+        }
+
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+        let currentUser = null;
+
+        // Static Counties
+        const counties = ["Uasin Gishu (Eldoret)", "Kericho", "Bomet", "Nakuru", "Narok", "Kisumu", "Nandi", "Trans Nzoia", "Kakamega", "Vihiga", "Bungoma", "Busia", "Elgeyo Marakwet", "Baringo", "Nairobi", "Mombasa", "Kajiado"];
+
+        // Branch list heavily weighted toward new Eldoret branch
+        const branches = [
+            "Eldoret Mega Branch (Opening Soon)", "Eldoret Wholesale Depot (Opening Soon)",
+            "Kericho Town Main Branch", "Kericho Wholesale Depot", "Bomet Supermarket",
+            "Nakuru Westside Branch", "Litein Wholesale Outlet", "Kaplong Supermarket",
+            "Narok Town Branch", "Kisumu Mega Outlet", "Sotik Store"
+        ];
+
+        // Expanded Job Listings: 13 Supermarket & 11 Wholesale Roles
+        const jobsData = {
+            supermarket: [
+                {
+                    title: "Store Cleaner & Janitor",
+                    division: "Supermarket",
+                    desc: "Maintain floor hygiene, customer walkways, shelf cleanliness, and rest room sanitation.",
+                    quals: [
+                        "Ability to perform manual physical cleaning tasks diligently.",
+                        "Good personal hygiene and neat presentation.",
+                        "Willingness to work flexible early morning or late evening shifts.",
+                        "Strong teamwork and communication skills."
+                    ],
+                    q1: "Are you comfortable handling commercial cleaning chemicals and floor scrubbers?",
+                    q2: "What is your availability for early morning shift rotations?"
+                },
+                {
+                    title: "Shelf Stocker & Merchandiser",
+                    division: "Supermarket",
+                    desc: "Unpack delivered products, organize retail display racks, check expiry dates, and face goods.",
+                    quals: [
+                        "Physical stamina to stand and lift product crates up to 20kg.",
+                        "Keen attention to detail regarding expiry dates and price tags.",
+                        "Ability to follow store layout planograms accurately.",
+                        "Friendly attitude when approached by customers on the shop floor."
+                    ],
+                    q1: "Can you comfortably lift heavy product boxes (up to 20kg)?",
+                    q2: "How do you ensure oldest stock is placed at the front of the shelf (FIFO)?"
+                },
+                {
+                    title: "Trolley Attendant & Porter",
+                    division: "Supermarket",
+                    desc: "Collect customer shopping carts, organize entrance bays, and assist shoppers loading vehicles.",
+                    quals: [
+                        "Physical agility for outdoor walking and moving trolley lines.",
+                        "Polite and courteous customer assistance demeanor.",
+                        "High reliability during heavy peak shopping hours.",
+                        "Clean track record of honesty and safety."
+                    ],
+                    q1: "Are you comfortable working outdoors in varying weather conditions?",
+                    q2: "How do you react when a customer requests assistance loading fragile items?"
+                },
+                {
+                    title: "Supermarket Cashier",
+                    division: "Supermarket",
+                    desc: "Operate POS barcode scanners, balance daily cash drawers, and process M-PESA & card payments.",
+                    quals: [
+                        "Strong basic mathematics and numerical accuracy.",
+                        "Basic computer literacy and comfort with POS touchscreens.",
+                        "Excellent customer relations and conflict handling.",
+                        "High integrity with cash and drawer reconciliations."
+                    ],
+                    q1: "Do you have prior experience operating a point-of-sale (POS) terminal?",
+                    q2: "How do you handle a situation where a customer's payment fails or is insufficient?"
+                },
+                {
+                    title: "Customer Care & Service Desk Clerk",
+                    division: "Supermarket",
+                    desc: "Manage customer service counter, handle product returns, answer phone queries, and announce promos.",
+                    quals: [
+                        "Fluent verbal communication in both Kiswahili and English.",
+                        "Patience and emotional intelligence in handling customer complaints.",
+                        "Basic administrative record-keeping skills.",
+                        "Professional and welcoming personal presentation."
+                    ],
+                    q1: "How do you de-escalate an interaction with an upset customer?",
+                    q2: "Rate your computer literacy and communication speed out of 10."
+                },
+                {
+                    title: "Fresh Produce Attendant",
+                    division: "Supermarket",
+                    desc: "Sort, weigh, price, and display fresh fruits, vegetables, and farm produce daily.",
+                    quals: [
+                        "Knowledge of fresh produce quality, sorting, and misting.",
+                        "Ability to operate digital weighing and pricing scales.",
+                        "Commitment to food safety and hygiene standards.",
+                        "Active customer engagement in recommending fresh produce."
+                    ],
+                    q1: "How do you identify and handle fresh produce that is deteriorating?",
+                    q2: "Are you comfortable working in cold storage display areas?"
+                },
+                {
+                    title: "Bakery Assistant & Wrapper",
+                    division: "Supermarket",
+                    desc: "Assist bakers in packaging, slicing, labeling, and displaying fresh bread and pastries.",
+                    quals: [
+                        "Possession of a valid Food Handler's Medical Certificate.",
+                        "Strict adherence to personal sanitation and hair coverage.",
+                        "Speed and accuracy in food wrapping and heat sealing.",
+                        "Basic arithmetic for counting daily tray outputs."
+                    ],
+                    q1: "Do you hold a valid Food Handler's Medical Certificate?",
+                    q2: "What prior baking or food packaging experience do you possess?"
+                },
+                {
+                    title: "Butchery & Meat Counter Attendant",
+                    division: "Supermarket",
+                    desc: "Assist meat cutters, package meat cuts, operate weighing scales, and sanitize meat counters.",
+                    quals: [
+                        "Valid Food Handler's Medical clearance.",
+                        "Knowledge of hygiene in handling raw meat and poultry.",
+                        "Physical capability to handle heavy meat carcasses.",
+                        "Customer service orientation for custom meat cutting requests."
+                    ],
+                    q1: "Are you comfortable working in refrigerated meat cutting rooms?",
+                    q2: "How do you maintain cross-contamination safety between poultry and beef?"
+                },
+                {
+                    title: "Deli & Hot Food Counter Server",
+                    division: "Supermarket",
+                    desc: "Serve hot meals, snacks, and deli dishes to customers while maintaining strict food temperature logs.",
+                    quals: [
+                        "Valid Food Handler's Medical clearance.",
+                        "Friendly and fast customer serving speed.",
+                        "Strict adherence to temperature control and sanitation.",
+                        "Ability to stand for extended durations during lunch rush hours."
+                    ],
+                    q1: "How do you ensure hot food remains at safe serving temperatures?",
+                    q2: "Describe your experience in fast-paced food service."
+                },
+                {
+                    title: "Store Loss Prevention Guard",
+                    division: "Supermarket",
+                    desc: "Monitor store entrances, verify customer receipts, inspect staff exits, and deter shoplifting.",
+                    quals: [
+                        "Valid Certificate of Good Conduct from DCI.",
+                        "Sharp observation skills and alertness.",
+                        "Calm demeanor in handling security discrepancies.",
+                        "Physical fitness and ability to stand throughout shift."
+                    ],
+                    q1: "Do you possess a current Certificate of Good Conduct?",
+                    q2: "How do you handle a scenario where an un-receipted item is detected at the exit?"
+                },
+                {
+                    title: "Inventory Counting Assistant",
+                    division: "Supermarket",
+                    desc: "Conduct night and stocktake counts, audit shelf quantities, and report discrepancies.",
+                    quals: [
+                        "Exceptional numerical accuracy and speed.",
+                        "Methodical approach to systematic counting.",
+                        "Flexibility to work overnight stocktaking shifts.",
+                        "Basic barcode scanner operation."
+                    ],
+                    q1: "Are you available for periodic night shift stocktakes?",
+                    q2: "How do you ensure double-counting does not occur during stock audits?"
+                },
+                {
+                    title: "Receiving Bay Supervisor Assistant",
+                    division: "Supermarket",
+                    desc: "Inspect incoming supplier trucks, cross-check Delivery Notes against Purchase Orders, and verify seals.",
+                    quals: [
+                        "Strong organizational and documentation skills.",
+                        "Keen eye for detecting damaged goods or quantity shortages.",
+                        "Basic computer entry for goods receipt notes (GRN).",
+                        "High ethical standards against vendor collusion."
+                    ],
+                    q1: "How do you verify delivery quantities against supplier delivery notes?",
+                    q2: "What steps do you take when incoming goods fail quality checks?"
+                },
+                {
+                    title: "E-Commerce Order Picker & Runner",
+                    division: "Supermarket",
+                    desc: "Pick online orders from supermarket aisles, pack securely, and hand over to delivery couriers.",
+                    quals: [
+                        "Fast walking speed and familiarity with store aisles.",
+                        "High accuracy in picking correct brand variants and weights.",
+                        "Basic mobile application usage for order fulfillment.",
+                        "Careful packing of fragile household goods."
+                    ],
+                    q1: "How fast can you locate items in a large retail supermarket?",
+                    q2: "Are you comfortable using smartphone apps to process picking lists?"
+                }
+            ],
+            wholesale: [
+                {
+                    title: "Warehouse Loader & Heavy Offloader",
+                    division: "Wholesale",
+                    desc: "Manually offload bulk supply lorries and stack 50kg sacks of flour, sugar, and rice in warehouse bays.",
+                    quals: [
+                        "High physical strength and endurance for heavy manual lifting.",
+                        "Knowledge of safe lifting techniques to prevent injury.",
+                        "Punctuality for early morning truck dispatch schedules.",
+                        "Strong team spirit and reliability."
+                    ],
+                    q1: "Are you physically capable of loading and offloading 50kg commodity bags continuously?",
+                    q2: "What is your availability for early morning lorry offloading?"
+                },
+                {
+                    title: "Wholesale Order Picker & Stacker",
+                    division: "Wholesale",
+                    desc: "Assemble bulk customer orders from warehouse stacks and load pickup vehicles.",
+                    quals: [
+                        "Accuracy in counting bulk cartons and bag bundles.",
+                        "Ability to organize pallet loads securely.",
+                        "Physical fitness for continuous warehouse movement.",
+                        "Honesty and precision in order fulfillment."
+                    ],
+                    q1: "How do you verify that bulk carton counts match customer invoices?",
+                    q2: "Do you have prior experience working in a wholesale or distribution warehouse?"
+                },
+                {
+                    title: "Wholesale Inventory & Dispatch Clerk",
+                    division: "Wholesale",
+                    desc: "Record bulk goods movements, print dispatch manifests, and reconcile daily warehouse balance.",
+                    quals: [
+                        "High numerical proficiency and accuracy.",
+                        "Basic computer data entry (Excel / ERP systems).",
+                        "Attention to detail on batch numbers and expiry dates.",
+                        "Ability to work efficiently under heavy depot pressure."
+                    ],
+                    q1: "What experience do you have with inventory logging or stock tracking books?",
+                    q2: "How do you handle stock discrepancy reconciliation?"
+                },
+                {
+                    title: "Forklift Operator (Eldoret & Main Depots)",
+                    division: "Wholesale",
+                    desc: "Operate counterbalanced diesel/electric forklifts to move palletized goods onto high racks.",
+                    quals: [
+                        "Valid Forklift Operator License & Driving License.",
+                        "Minimum 1 year of active industrial forklift operation.",
+                        "Strict adherence to warehouse safety protocols.",
+                        "Basic mechanical troubleshooting skills."
+                    ],
+                    q1: "Do you possess a valid Forklift Operator License?",
+                    q2: "How many years of active forklift operating experience do you have?"
+                },
+                {
+                    title: "Wholesale Cashier & Billing Clerk",
+                    division: "Wholesale",
+                    desc: "Issue bulk wholesale tax invoices, process high-value M-PESA/bank transfers, and clear drivers.",
+                    quals: [
+                        "Strong accounting or financial transaction background.",
+                        "Proficiency in computerized invoicing systems.",
+                        "High speed and zero-tolerance for cash balancing errors.",
+                        "Professional demeanor with bulk trade buyers."
+                    ],
+                    q1: "Have you handled high-value cash and M-PESA Paybill transactions before?",
+                    q2: "Describe your experience with tax invoicing and receipt generation."
+                },
+                {
+                    title: "Bulk Grain & Flour Inspector",
+                    division: "Wholesale",
+                    desc: "Inspect incoming grain bags for moisture, bag tears, pest infestation, and weight compliance.",
+                    quals: [
+                        "Knowledge of agricultural commodity grading standards.",
+                        "Attention to detail and quality control procedures.",
+                        "Ability to operate moisture meters and weighing equipment.",
+                        "Firmness in rejecting non-compliant grain deliveries."
+                    ],
+                    q1: "How do you check incoming grain bags for moisture or pest contamination?",
+                    q2: "Describe your experience in agricultural or food commodity inspection."
+                },
+                {
+                    title: "Wholesale Sales Counter Assistant",
+                    division: "Wholesale",
+                    desc: "Assist shopkeepers and institutions placing bulk orders at the wholesale counter.",
+                    quals: [
+                        "Good product knowledge across FMCG and grain categories.",
+                        "Excellent customer service and persuasive sales skills.",
+                        "Ability to calculate bulk carton discount structures.",
+                        "Active listener with clear communication."
+                    ],
+                    q1: "How do you handle price negotiation queries from bulk buyers?",
+                    q2: "What is your familiarity with wholesale FMCG product lines?"
+                },
+                {
+                    title: "Heavy Commercial Truck Driver (Wholesale Fleet)",
+                    division: "Wholesale",
+                    desc: "Drive medium to heavy distribution lorries transporting wholesale orders to regional branches.",
+                    quals: [
+                        "Valid Commercial Driving License (Class BCE / C1, C).",
+                        "Clean driving record for at least 3 consecutive years.",
+                        "Valid Certificate of Good Conduct.",
+                        "Familiarity with Western Kenya & South Rift road routes."
+                    ],
+                    q1: "What class is your valid driving license and how long have you driven commercial lorries?",
+                    q2: "Are you familiar with delivery routes across Uasin Gishu, Kericho, and Nakuru?"
+                },
+                {
+                    title: "Turnboy & Lorry Escort",
+                    division: "Wholesale",
+                    desc: "Accompany delivery drivers, assist in offloading at customer premises, and secure vehicle cargo.",
+                    quals: [
+                        "Physical stamina for travel and manual offloading.",
+                        "Reliable, honest, and safety-conscious attitude.",
+                        "Ability to verify delivery receipts signed by customers.",
+                        "Good customer relation skills upon delivery."
+                    ],
+                    q1: "Are you ready to travel on long-distance delivery trips across counties?",
+                    q2: "How do you ensure cargo remains secure on the lorry during transit?"
+                },
+                {
+                    title: "Wholesale Depot Security Supervisor",
+                    division: "Wholesale",
+                    desc: "Supervise depot entry gates, inspect lorry weighbridge passes, and oversee guard shifts.",
+                    quals: [
+                        "Prior supervisory experience in industrial security.",
+                        "Valid Certificate of Good Conduct.",
+                        "Firmness in enforcing gate pass and seal checks.",
+                        "Leadership skills in managing security teams."
+                    ],
+                    q1: "Do you have prior supervisory experience in warehouse or gate security?",
+                    q2: "How do you verify lorry seals against dispatch documentation?"
+                },
+                {
+                    title: "Depot Maintenance Technician",
+                    division: "Wholesale",
+                    desc: "Perform general repairs on warehouse lighting, rolling shutters, pallets, and facilities.",
+                    quals: [
+                        "Craft Certificate in Electrical, Mechanical, or General Building.",
+                        "Practical troubleshooting skills for industrial facilities.",
+                        "Safety consciousness working at heights.",
+                        "Self-driven problem solver."
+                    ],
+                    q1: "What technical or electrical maintenance qualifications do you hold?",
+                    q2: "Describe a complex facility repair task you completed successfully."
+                }
+            ]
+        };
+
+        // Utility: Get a random weekday deadline using browser's date
+        function getRandomWeekdayDeadline() {
+            let daysToAdd = Math.floor(Math.random() * 4) + 2; // 2 to 5 days ahead
+            let d = new Date(); // Browser date
+            let added = 0;
+            while(added < daysToAdd) {
+                d.setDate(d.getDate() + 1);
+                if(d.getDay() !== 0 && d.getDay() !== 6) added++; // Skip weekends
+            }
+            return d.toLocaleDateString('en-KE', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        // Main Portal App Object
+        window.app = {
+            paymentConfig: {
+                supermarketFee: 10,
+                wholesaleFee: 20,
+                method: 'Till Number',
+                number: '5401672' // Fallback
+            },
+
+            init: async function() {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    currentUser = auth.currentUser;
+
+                    // Fetch dynamic double-fee config from public Firestore node
+                    const cfgRef = doc(db, 'artifacts', appId, 'public', 'data', 'config', 'paymentConfig');
+                    const snap = await getDoc(cfgRef);
+                    if (snap.exists()) {
+                        this.paymentConfig = snap.data();
+                    }
+                } catch (e) {
+                    console.error("Firebase auth/config init error", e);
+                }
+
+                // Populate Counties dropdown
+                const countySel = document.getElementById('f_county');
+                counties.sort().forEach(c => {
+                    let opt = document.createElement('option');
+                    opt.value = c; opt.textContent = c;
+                    countySel.appendChild(opt);
+                });
+
+                this.careers.init();
+            },
+
+            navigate: function(pageId) {
+                document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+                const p = document.getElementById('page-' + pageId);
+                if(p) {
+                    p.classList.add('active');
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                }
+            },
+
+            showToast: function(msg, type='info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = msg;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(10px)';
+                    toast.style.transition = 'all 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+            },
+
+            careers: {
+                activeDivision: 'supermarket',
+                selectedJobData: null,
+                selectedBranch: null,
+                applicationData: {},
+                paymentAttempts: 0,
+
+                init: function() {
+                    this.renderJobs();
+                },
+
+                showView: function(viewId) {
+                    const views = ['jobList', 'statusCheck', 'applyForm', 'preview', 'payment', 'success'];
+                    views.forEach(v => document.getElementById('view-' + v).classList.add('hidden'));
+                    document.getElementById('view-' + viewId).classList.remove('hidden');
+                    if(viewId === 'payment') this.paymentAttempts = 0;
+                },
+
+                switchDivision: function(divName) {
+                    this.activeDivision = divName;
+                    
+                    const tabSup = document.getElementById('tab-supermarket');
+                    const tabWho = document.getElementById('tab-wholesale');
+                    const title = document.getElementById('division-title');
+
+                    if (divName === 'supermarket') {
+                        tabSup.className = "py-2.5 px-4 font-bold text-xs border-b-2 border-kipchi-red text-kipchi-red flex items-center gap-2 cursor-pointer transition";
+                        tabWho.className = "py-2.5 px-4 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition";
+                        title.textContent = "Supermarket Outlets - Open Vacancies";
+                    } else {
+                        tabWho.className = "py-2.5 px-4 font-bold text-xs border-b-2 border-kipchi-red text-kipchi-red flex items-center gap-2 cursor-pointer transition";
+                        tabSup.className = "py-2.5 px-4 font-bold text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 cursor-pointer transition";
+                        title.textContent = "Wholesale Warehouses - Open Vacancies";
+                    }
+
+                    this.renderJobs();
+                },
+
+                renderJobs: function() {
+                    const container = document.getElementById('job-list-container');
+                    container.innerHTML = '';
+                    
+                    const currentList = jobsData[this.activeDivision];
+                    
+                    currentList.forEach((job, index) => {
+                        // Ensure Eldoret branches appear frequently
+                        let availableBranches = [];
+                        if (index % 2 === 0) {
+                            availableBranches = ["Eldoret Mega Branch (Opening Soon)", branches[Math.floor(Math.random() * (branches.length - 2)) + 2]];
+                        } else {
+                            availableBranches = [...branches].sort(() => 0.5 - Math.random()).slice(0, 2);
+                        }
+                        
+                        let card = document.createElement('div');
+                        card.className = "bg-white border border-slate-200 p-3.5 rounded-lg flex flex-col shadow-sm hover:shadow transition";
+                        
+                        let html = `
+                            <div class="flex justify-between items-start mb-1">
+                                <h4 class="font-bold text-slate-800 text-sm">${job.title}</h4>
+                            </div>
+                            <p class="text-[10px] text-slate-500 mb-3 leading-relaxed">${job.desc}</p>
+                            <div class="mt-auto space-y-2 border-t border-slate-100 pt-2">
+                                <span class="text-[9px] uppercase font-bold text-slate-400">Select Work Station:</span>
+                        `;
+                        
+                        availableBranches.forEach(branch => {
+                            let vacancies = branch.includes("Eldoret") ? Math.floor(Math.random() * 25) + 15 : Math.floor(Math.random() * 12) + 2;
+                            let deadline = getRandomWeekdayDeadline();
+                            
+                            html += `
+                                <div class="bg-slate-50 p-2 rounded border border-slate-100 text-xs flex justify-between items-center group cursor-pointer hover:border-kipchi-red transition" 
+                                     onclick="app.careers.startApplication('${this.activeDivision}', ${index}, '${branch}')">
+                                    <div>
+                                        <div class="font-bold text-slate-700 text-[11px] group-hover:text-kipchi-red transition">${branch}</div>
+                                        <div class="text-[9px] text-slate-500 mt-0.5">Vacancies: <span class="font-bold text-slate-700">${vacancies}</span> | Closes: ${deadline}</div>
+                                    </div>
+                                    <span class="text-kipchi-red font-bold px-2 py-1 rounded bg-white border border-slate-200 group-hover:bg-kipchi-red group-hover:text-white transition text-[10px]">Apply</span>
+                                </div>
+                            `;
+                        });
+                        
+                        html += `</div>`;
+                        card.innerHTML = html;
+                        container.appendChild(card);
+                    });
+                },
+
+                startApplication: function(division, jobIdx, branchName) {
+                    this.selectedJobData = jobsData[division][jobIdx];
+                    this.selectedBranch = branchName;
+
+                    document.getElementById('form-job-title').textContent = this.selectedJobData.title;
+                    document.getElementById('form-job-branch').textContent = `${branchName} (${this.selectedJobData.division})`;
+
+                    // Display 4 professional qualifications
+                    const qualUl = document.getElementById('form-job-qualifications');
+                    qualUl.innerHTML = this.selectedJobData.quals.map(q => `<li>${q}</li>`).join('');
+
+                    // Questionnaire questions
+                    const qContainer = document.getElementById('dynamic-questions-container');
+                    qContainer.innerHTML = `
+                        <div>
+                            <label class="form-label">${this.selectedJobData.q1} *</label>
+                            <input type="text" id="q_ans1" required class="form-input text-xs" placeholder="Detailed answer...">
+                        </div>
+                        <div>
+                            <label class="form-label">${this.selectedJobData.q2} *</label>
+                            <input type="text" id="q_ans2" required class="form-input text-xs" placeholder="Detailed answer...">
+                        </div>
+                    `;
+
+                    document.getElementById('main-application-form').reset();
+                    document.getElementById('upload-progress-container').classList.add('hidden');
+                    document.getElementById('upload-zone').classList.remove('border-kipchi-red', 'bg-red-50');
+
+                    this.showView('applyForm');
+                },
+
+                handleFileUpload: function(input) {
+                    if(!input.files || input.files.length === 0) return;
+                    
+                    const progressContainer = document.getElementById('upload-progress-container');
+                    const bar = document.getElementById('upload-progress-bar');
+                    const text = document.getElementById('upload-status-text');
+                    const zone = document.getElementById('upload-zone');
+                    
+                    progressContainer.classList.remove('hidden');
+                    bar.style.width = '0%';
+                    text.textContent = `Uploading ${input.files[0].name}...`;
+                    
+                    let progress = 0;
+                    let interval = setInterval(() => {
+                        progress += Math.floor(Math.random() * 25) + 15;
+                        if(progress >= 100) {
+                            progress = 100;
+                            clearInterval(interval);
+                            text.textContent = `Attached: ${input.files[0].name} (100%)`;
+                            text.classList.add('text-kipchi-red', 'font-bold');
+                            zone.classList.add('border-kipchi-red', 'bg-red-50/30');
+                        }
+                        bar.style.width = progress + '%';
+                    }, 250);
+                },
+
+                processForm: function() {
+                    this.applicationData = {
+                        firstName: document.getElementById('f_fname').value.trim(),
+                        lastName: document.getElementById('f_lname').value.trim(),
+                        idNumber: document.getElementById('f_id').value.trim(),
+                        dob: document.getElementById('f_dob').value,
+                        phone: document.getElementById('f_phone').value.trim(),
+                        email: document.getElementById('f_email').value.trim(),
+                        county: document.getElementById('f_county').value,
+                        subcounty: document.getElementById('f_subcounty').value.trim(),
+                        address: document.getElementById('f_address').value.trim(),
+                        education: document.getElementById('f_education').value,
+                        experience: document.getElementById('f_experience').value,
+                        relocate: document.getElementById('f_relocate').value,
+                        startDate: document.getElementById('f_start_date').value,
+                        jobTitle: this.selectedJobData.title,
+                        division: this.selectedJobData.division,
+                        branch: this.selectedBranch,
+                        answers: [
+                            { q: this.selectedJobData.q1, a: document.getElementById('q_ans1').value.trim() },
+                            { q: this.selectedJobData.q2, a: document.getElementById('q_ans2').value.trim() }
+                        ]
+                    };
+
+                    // Populate Preview
+                    document.getElementById('prev_division_badge').textContent = this.applicationData.division;
+                    document.getElementById('prev_role').textContent = this.applicationData.jobTitle;
+                    document.getElementById('prev_branch').textContent = this.applicationData.branch;
+                    document.getElementById('prev_name').textContent = `${this.applicationData.firstName} ${this.applicationData.lastName}`;
+                    document.getElementById('prev_id').textContent = this.applicationData.idNumber;
+                    document.getElementById('prev_phone').textContent = this.applicationData.phone;
+                    document.getElementById('prev_county').textContent = `${this.applicationData.county} (${this.applicationData.subcounty})`;
+                    document.getElementById('prev_edu').textContent = this.applicationData.education;
+                    document.getElementById('prev_exp').textContent = this.applicationData.experience;
+
+                    const ansDiv = document.getElementById('prev_answers');
+                    ansDiv.innerHTML = this.applicationData.answers.map((ans, i) => 
+                        `<div class="bg-white p-2 rounded border border-slate-100 shadow-sm"><p class="font-bold text-slate-700 text-[10px]">Q${i+1}: ${ans.q}</p><p class="text-slate-600 italic text-[11px]">"${ans.a}"</p></div>`
+                    ).join('');
+
+                    this.showView('preview');
+                },
+
+                showPayment: function() {
+                    const isWholesale = this.applicationData.division === 'Wholesale';
+                    const feeToCharge = isWholesale ? 
+                        (app.paymentConfig.wholesaleFee || 20) : 
+                        (app.paymentConfig.supermarketFee || 10);
+
+                    document.getElementById('pay_div_label').textContent = `${this.applicationData.division} Division`;
+                    document.getElementById('pay_fee').textContent = feeToCharge;
+                    document.getElementById('pay_method').textContent = app.paymentConfig.method || 'Till Number';
+                    document.getElementById('pay_number').textContent = app.paymentConfig.number || '5401672';
+                    document.getElementById('pay_acc_hint').textContent = this.applicationData.idNumber;
+
+                    document.getElementById('f_trans_code').value = '';
+                    this.showView('payment');
+                },
+
+                submitFinalApplication: async function() {
+                    const tCode = document.getElementById('f_trans_code').value.trim().toUpperCase();
+                    if(!/^[A-Z0-9]{10}$/.test(tCode)) {
+                        app.showToast("Invalid M-PESA Code. Must be 10 characters.", "error");
+                        return;
+                    }
+
+                    const btn = document.getElementById('btn_final_submit');
+                    const spinner = document.getElementById('spinner');
+                    btn.disabled = true; spinner.classList.remove('hidden');
+
+                    // Simulate 4-second delay and first attempt failure
+                    if (this.paymentAttempts === 0) {
+                        setTimeout(() => {
+                            btn.disabled = false; spinner.classList.add('hidden');
+                            app.showToast("Payment not recognized. Check if paid or wait at least 10 seconds for confirmation SMS.", "error");
+                            this.paymentAttempts++;
+                        }, 4000);
+                        return;
+                    }
+
+                    // Save to Firestore
+                    try {
+                        if (!currentUser) throw new Error("No user auth");
+
+                        this.applicationData.transactionCode = tCode;
+                        this.applicationData.status = 'Under Review';
+                        this.applicationData.timestamp = serverTimestamp();
+                        this.applicationData.userId = currentUser.uid;
+
+                        // Save in Firebase Cloud
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'applications', this.applicationData.idNumber);
+                        await setDoc(docRef, this.applicationData);
+
+                        document.getElementById('succ_id').textContent = this.applicationData.idNumber;
+                        document.getElementById('succ_name').textContent = this.applicationData.lastName;
+                        document.getElementById('succ_division').textContent = this.applicationData.division;
+
+                        this.showView('success');
+                        app.showToast("Application submitted successfully!", "success");
+
+                    } catch (e) {
+                        console.error("Firestore Error:", e);
+                        app.showToast("Submission failed. Connection error.", "error");
+                    } finally {
+                        btn.disabled = false; spinner.classList.add('hidden');
+                    }
+                },
+
+                checkStatus: async function() {
+                    const idVal = document.getElementById('status-id').value.trim();
+                    const lnameVal = document.getElementById('status-lastname').value.trim().toLowerCase();
+                    const resDiv = document.getElementById('status-result');
+                    const btn = document.querySelector('#view-statusCheck button[type="submit"]');
+                    const spinner = document.getElementById('status-spinner');
+
+                    resDiv.classList.remove('hidden');
+                    resDiv.innerHTML = `<p class="text-[10px] text-slate-500 animate-pulse flex items-center justify-center gap-2"><span class="spinner !border-slate-400 !border-t-transparent w-3 h-3"></span> Querying database...</p>`;
+                    btn.disabled = true; spinner.classList.remove('hidden');
+
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'applications', idVal);
+                        const snap = await getDoc(docRef);
+
+                        setTimeout(() => {
+                            if(snap.exists()) {
+                                const data = snap.data();
+                                if(data.lastName.toLowerCase() === lnameVal) {
+                                    const dateStr = data.timestamp && data.timestamp.toDate ? data.timestamp.toDate().toLocaleDateString() : 'Recent';
+                                    resDiv.innerHTML = `
+                                        <div class="text-left space-y-2 w-full text-xs">
+                                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-500">Applicant:</span><strong class="uppercase text-slate-800">${data.firstName} ${data.lastName}</strong></div>
+                                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-500">Division:</span><strong class="text-kipchi-red">${data.division}</strong></div>
+                                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-500">Role:</span><strong class="text-slate-800">${data.jobTitle}</strong></div>
+                                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-500">Station:</span><strong class="text-slate-800">${data.branch}</strong></div>
+                                            <div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-500">Applied On:</span><strong class="text-slate-800">${dateStr}</strong></div>
+                                            <div class="flex justify-between pt-1 items-center"><span class="text-slate-500 font-bold">Status:</span>
+                                                <strong class="bg-red-50 border border-red-200 text-kipchi-red px-2 py-1 rounded text-[10px] uppercase font-bold tracking-wider">
+                                                    ${data.status}
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    `;
+                                } else {
+                                    resDiv.innerHTML = `<p class="text-red-500 text-xs font-bold">Details mismatch. Check Last Name.</p>`;
+                                }
+                            } else {
+                                resDiv.innerHTML = `<p class="text-red-500 text-xs font-bold">No application found for ID: ${idVal}</p>`;
+                            }
+                            btn.disabled = false; spinner.classList.add('hidden');
+                        }, 800);
+                    } catch (e) {
+                        console.error(e);
+                        resDiv.innerHTML = `<p class="text-red-500 text-xs font-bold">System Error reading database.</p>`;
+                        btn.disabled = false; spinner.classList.add('hidden');
+                    }
+                }
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
