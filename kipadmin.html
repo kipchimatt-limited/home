@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -607,7 +606,7 @@
                 };
                 document.getElementById('page-title').textContent = titles[viewId] || 'Portal';
 
-                // 4. Forcefully hide ALL view sections first to avoid stale views staying visible
+                // 4. Forcefully hide ALL view sections first
                 document.querySelectorAll('.view-section').forEach(el => {
                     el.classList.remove('active');
                     el.style.display = 'none';
@@ -618,6 +617,72 @@
                 if(targetView) {
                     targetView.classList.add('active');
                     targetView.style.display = 'block';
+                }
+            },
+
+            showToast: function(msg, type='info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `<span>${msg}</span> <button onclick="this.parentElement.remove()">×</button>`;
+                container.appendChild(toast);
+                setTimeout(() => { if(toast.parentElement) toast.remove(); }, 4000);
+            },
+
+            fetchData: function() {
+                if (!this.currentUser) return;
+                
+                // Clear any active unsubscribers
+                if (this.unsubscribeApps && this.unsubscribeApps.length) {
+                    this.unsubscribeApps.forEach(unsub => unsub());
+                }
+                this.unsubscribeApps = [];
+
+                this.showToast("Syncing with cloud database...", "info");
+
+                const appMap = new Map();
+
+                const processSnapshot = (snapshot, sourcePath) => {
+                    snapshot.forEach((docSnap) => {
+                        appMap.set(docSnap.id, { docId: docSnap.id, sourcePath: sourcePath, ...docSnap.data() });
+                    });
+
+                    this.applications = Array.from(appMap.values());
+                    this.applications.sort((a, b) => {
+                        const tA = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : 0) : 0;
+                        const tB = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : 0) : 0;
+                        return tB - tA;
+                    });
+
+                    this.updateDashboard();
+                    this.filterTable();
+                };
+
+                // Listen to primary artifacts collection path
+                const path1Ref = collection(this.db, 'artifacts', this.appId, 'public', 'data', 'applications');
+                const unsub1 = onSnapshot(path1Ref, (snap) => processSnapshot(snap, 'artifacts'), (err) => console.log("Path 1 sync warning:", err));
+                this.unsubscribeApps.push(unsub1);
+
+                // Listen to fallback root collection path
+                const path2Ref = collection(this.db, 'applications');
+                const unsub2 = onSnapshot(path2Ref, (snap) => processSnapshot(snap, 'root'), (err) => console.log("Path 2 sync warning:", err));
+                this.unsubscribeApps.push(unsub2);
+            },
+
+            fetchConfig: async function() {
+                if (!this.currentUser) return;
+                try {
+                    const cfgRef = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'config', 'paymentConfig');
+                    const snap = await getDoc(cfgRef);
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        document.getElementById('cfg_sup_fee').value = data.supermarketFee || 10;
+                        document.getElementById('cfg_who_fee').value = data.wholesaleFee || 20;
+                        document.getElementById('cfg_method').value = data.method || 'Till Number';
+                        document.getElementById('cfg_number').value = data.number || '5401672';
+                    }
+                } catch(e) {
+                    console.error("Config fetch error", e);
                 }
             },
 
