@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,7 +54,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         #toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
-        .toast { padding: 0.5rem 0.75rem; border-radius: 0.25rem; color: white; font-weight: 500; font-size: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out forwards; min-width: 250px; display: flex; justify-between: space-between; align-items: center; }
+        .toast { padding: 0.5rem 0.75rem; border-radius: 0.25rem; color: white; font-weight: 500; font-size: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out forwards; min-width: 250px; display: flex; justify-content: space-between; align-items: center; }
         .toast.success { background-color: #10b981; }
         .toast.error { background-color: #ef4444; }
         .toast.info { background-color: #3b82f6; }
@@ -109,30 +110,30 @@
         <nav class="flex-1 overflow-y-auto py-4">
             <ul class="space-y-1">
                 <li>
-                    <a href="#" onclick="adminApp.navigate('dashboard')" id="nav-dashboard" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                    <button onclick="adminApp.navigate('dashboard')" id="nav-dashboard" class="w-full text-left flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-kipchi-red bg-slate-900 text-white transition nav-link">
                         <span class="mr-3 text-lg">📊</span> Dashboard Stats
-                    </a>
+                    </button>
                 </li>
                 <li>
-                    <a href="#" onclick="adminApp.navigate('applications')" id="nav-applications" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                    <button onclick="adminApp.navigate('applications')" id="nav-applications" class="w-full text-left flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
                         <span class="mr-3 text-lg">👥</span> Applicant Records
                         <span id="nav-pending-count" class="ml-auto bg-kipchi-red text-white text-[9px] font-bold px-2 py-0.5 rounded-full hidden">0</span>
-                    </a>
+                    </button>
                 </li>
                 <li>
-                    <a href="#" onclick="adminApp.navigate('settings')" id="nav-settings" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                    <button onclick="adminApp.navigate('settings')" id="nav-settings" class="w-full text-left flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
                         <span class="mr-3 text-lg">⚙️</span> Fee & Gateway Config
-                    </a>
+                    </button>
                 </li>
                 <li>
-                    <a href="#" onclick="adminApp.navigate('security')" id="nav-security" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                    <button onclick="adminApp.navigate('security')" id="nav-security" class="w-full text-left flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
                         <span class="mr-3 text-lg">🔒</span> Security & PIN
-                    </a>
+                    </button>
                 </li>
                 <li>
-                    <a href="#" onclick="adminApp.navigate('reports')" id="nav-reports" class="flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
+                    <button onclick="adminApp.navigate('reports')" id="nav-reports" class="w-full text-left flex items-center px-4 py-2.5 text-sm hover:bg-slate-900 hover:text-white border-l-4 border-transparent transition nav-link">
                         <span class="mr-3 text-lg">📑</span> Export CSV Reports
-                    </a>
+                    </button>
                 </li>
             </ul>
         </nav>
@@ -151,7 +152,7 @@
         
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 shadow-sm z-10">
             <div class="flex items-center">
-                <button class="md:hidden text-slate-700 mr-3 text-xl" onclick="document.getElementById('sidebar').classList.toggle('hidden')">☰</button>
+                <button class="md:hidden text-slate-700 mr-3 text-xl" onclick="document.getElementById('mobile-drawer').classList.remove('hidden')">☰</button>
                 <h1 id="page-title" class="font-extrabold text-lg text-slate-800">Dashboard Overview</h1>
             </div>
             <div class="flex items-center gap-3">
@@ -164,6 +165,47 @@
                 </div>
             </div>
         </header>
+
+        <!-- MOBILE DRAWER NAVIGATION -->
+        <div id="mobile-drawer" class="fixed inset-0 bg-slate-900/80 z-50 hidden md:hidden flex">
+            <div class="w-64 bg-kipchi-black h-full p-4 text-white flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                        <span class="font-extrabold text-sm text-kipchi-red">KIPCHIMATT MENU</span>
+                        <button class="text-xl font-bold p-1 text-slate-400" onclick="document.getElementById('mobile-drawer').classList.add('hidden')">✕</button>
+                    </div>
+                    <ul class="space-y-2">
+                        <li>
+                            <button onclick="adminApp.navigate('dashboard'); document.getElementById('mobile-drawer').classList.add('hidden')" class="w-full text-left py-2 px-3 rounded hover:bg-slate-800 text-xs font-bold flex items-center gap-2">
+                                📊 Dashboard Stats
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="adminApp.navigate('applications'); document.getElementById('mobile-drawer').classList.add('hidden')" class="w-full text-left py-2 px-3 rounded hover:bg-slate-800 text-xs font-bold flex items-center gap-2">
+                                👥 Applicant Records
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="adminApp.navigate('settings'); document.getElementById('mobile-drawer').classList.add('hidden')" class="w-full text-left py-2 px-3 rounded hover:bg-slate-800 text-xs font-bold flex items-center gap-2">
+                                ⚙️ Fee & Gateway Config
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="adminApp.navigate('security'); document.getElementById('mobile-drawer').classList.add('hidden')" class="w-full text-left py-2 px-3 rounded hover:bg-slate-800 text-xs font-bold flex items-center gap-2">
+                                🔒 Security & PIN
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="adminApp.navigate('reports'); document.getElementById('mobile-drawer').classList.add('hidden')" class="w-full text-left py-2 px-3 rounded hover:bg-slate-800 text-xs font-bold flex items-center gap-2">
+                                📑 Export CSV Reports
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <button onclick="location.reload()" class="btn btn-danger w-full py-2 text-xs">Lock System</button>
+            </div>
+            <div class="flex-1" onclick="document.getElementById('mobile-drawer').classList.add('hidden')"></div>
+        </div>
 
         <main class="flex-1 overflow-y-auto p-4 sm:p-6" id="main-content">
             
@@ -542,13 +584,20 @@
             },
 
             navigate: function(viewId) {
+                // 1. Remove active classes from all navigation links
                 document.querySelectorAll('.nav-link').forEach(el => {
                     el.classList.remove('bg-slate-900', 'text-white', 'border-kipchi-red');
                     el.classList.add('border-transparent');
                 });
+                
+                // 2. Highlight current active button
                 const activeLink = document.getElementById(`nav-${viewId}`);
-                if(activeLink) activeLink.classList.add('bg-slate-900', 'text-white', 'border-kipchi-red');
+                if(activeLink) {
+                    activeLink.classList.remove('border-transparent');
+                    activeLink.classList.add('bg-slate-900', 'text-white', 'border-kipchi-red');
+                }
 
+                // 3. Update Title Header
                 const titles = {
                     'dashboard': 'Dashboard Stats & Stream',
                     'applications': 'Applicant Database (CRUD)',
@@ -558,80 +607,17 @@
                 };
                 document.getElementById('page-title').textContent = titles[viewId] || 'Portal';
 
-                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-                const view = document.getElementById(`view-${viewId}`);
-                if(view) view.classList.add('active');
-            },
+                // 4. Forcefully hide ALL view sections first to avoid stale views staying visible
+                document.querySelectorAll('.view-section').forEach(el => {
+                    el.classList.remove('active');
+                    el.style.display = 'none';
+                });
 
-            showToast: function(msg, type='info') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.innerHTML = `<span>${msg}</span> <button onclick="this.parentElement.remove()">×</button>`;
-                container.appendChild(toast);
-                setTimeout(() => { if(toast.parentElement) toast.remove(); }, 4000);
-            },
-
-            fetchData: function() {
-                if (!this.currentUser) return;
-                
-                // Clear any existing snapshot subscriptions
-                if (this.unsubscribeApps && this.unsubscribeApps.length) {
-                    this.unsubscribeApps.forEach(unsub => unsub());
-                    this.unsubscribeApps = [];
-                }
-
-                this.showToast("Syncing records across collections...", "info");
-
-                const appMap = new Map();
-
-                const handleDocs = (snapshot, sourcePath) => {
-                    snapshot.forEach((docSnap) => {
-                        appMap.set(docSnap.id, { docId: docSnap.id, sourcePath: sourcePath, ...docSnap.data() });
-                    });
-                    
-                    this.applications = Array.from(appMap.values());
-                    this.applications.sort((a, b) => {
-                        const tA = a.timestamp ? (a.timestamp.toMillis ? a.timestamp.toMillis() : new Date(a.timestamp).getTime()) : 0;
-                        const tB = b.timestamp ? (b.timestamp.toMillis ? b.timestamp.toMillis() : new Date(b.timestamp).getTime()) : 0;
-                        return tB - tA;
-                    });
-
-                    this.updateDashboard();
-                    this.filterTable();
-                };
-
-                // Path 1: Canvas Environment Collection
-                const path1 = collection(this.db, 'artifacts', this.appId, 'public', 'data', 'applications');
-                const unsub1 = onSnapshot(path1, (snap) => handleDocs(snap, 'artifacts'), (err) => console.log("Path 1 error", err));
-
-                // Path 2: Root Applications Collection
-                const path2 = collection(this.db, 'applications');
-                const unsub2 = onSnapshot(path2, (snap) => handleDocs(snap, 'root'), (err) => console.log("Path 2 error", err));
-
-                this.unsubscribeApps = [unsub1, unsub2];
-            },
-
-            fetchConfig: async function() {
-                if (!this.currentUser) return;
-                try {
-                    let cfgRef = doc(this.db, 'artifacts', this.appId, 'public', 'data', 'config', 'paymentConfig');
-                    let snap = await getDoc(cfgRef);
-                    
-                    if (!snap.exists()) {
-                        cfgRef = doc(this.db, 'config', 'paymentConfig');
-                        snap = await getDoc(cfgRef);
-                    }
-
-                    if(snap.exists()) {
-                        const data = snap.data();
-                        document.getElementById('cfg_sup_fee').value = data.supermarketFee || 10;
-                        document.getElementById('cfg_who_fee').value = data.wholesaleFee || 20;
-                        document.getElementById('cfg_method').value = data.method || 'Till Number';
-                        document.getElementById('cfg_number').value = data.number || '5401672';
-                    }
-                } catch(e) {
-                    console.error("Config error", e);
+                // 5. Explicitly display the targeted view section
+                const targetView = document.getElementById(`view-${viewId}`);
+                if(targetView) {
+                    targetView.classList.add('active');
+                    targetView.style.display = 'block';
                 }
             },
 
